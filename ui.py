@@ -7,6 +7,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.behaviors import ButtonBehavior
 
+from big_two_draft1 import *
+
 
 class imgbtn(ButtonBehavior, Image):
     def __init__(self, **kwargs):
@@ -40,29 +42,74 @@ class CardWidget(ButtonBehavior, BoxLayout):
         CardDeckApp.l1 = self.rank_label
 
 
-class Deck:
-    def __init__(self):
-        self.cards = []
-        suits = ['hearts', 'diamonds', 'clubs', 'spades']
-        ranks = ['2', '3', '4', '5', '6', '7' ,'8', '9', '10','J','Q','K','A']
-        for suit in suits:
-            suit_image = f'{suit}.png'
-            for rank in ranks:
-                card = CardWidget(rank=rank, suit_image=suit_image)
-                self.cards.append(card)
+# class Deck:
+#     def __init__(self):
+#         self.cards = []
+#         suits = ['hearts', 'diamonds', 'clubs', 'spades']
+#         ranks = ['2', '3', '4', '5', '6', '7' ,'8', '9', '10','J','Q','K','A']
+#         for suit in suits:
+#             suit_image = f'{suit}.png'
+#             for rank in ranks:
+#                 card = CardWidget(rank=rank, suit_image=suit_image)
+#                 self.cards.append(card) 
 
-    def get_cards(self):
-        return self.cards
+#     def get_cards(self):
+#         return self.cards
 
 class CardDeckApp(App):
     def build(self):
         layout = GridLayout(cols=13, padding=100, spacing=100, row_default_height=100, size_hint=(None,None), row_force_default=True)
         layout.bind(minimum_height = layout.setter('height'), minimum_width=layout.setter('width'))
         
-        deck = Deck()
-        cards = deck.get_cards()
+        # deck = Deck()
+        # cards = deck.get_cards()
+        cardsP1 = game.players[0].hand
+        cardsP1Widget = []
+        for card in cardsP1:
+            rank = card.rank
+            suit = card.suit
+            suit_image = f'{suit}.png'
+            print(rank, suit_image)
+            card = CardWidget(rank=rank, suit_image=suit_image)
+            cardsP1Widget.append(card)
 
-        for card in cards:
+        cardsP2 = game.players[1].hand
+        cardsP2Widget = []
+        for card in cardsP2:
+            rank = card.rank
+            suit = card.suit
+            suit_image = f'{suit}.png'
+            print(rank, suit_image)
+            card = CardWidget(rank=rank, suit_image=suit_image)
+            cardsP2Widget.append(card)
+
+        cardsP3 = game.players[2].hand
+        cardsP3Widget = []
+        for card in cardsP3:
+            rank = card.rank
+            suit = card.suit
+            suit_image = f'{suit}.png'
+            print(rank, suit_image)
+            card = CardWidget(rank=rank, suit_image=suit_image)
+            cardsP3Widget.append(card)
+        
+        cardsP4 = game.players[3].hand
+        cardsP4Widget = []
+        for card in cardsP4:
+            rank = card.rank
+            suit = card.suit
+            suit_image = f'{suit}.png'
+            print(rank, suit_image)
+            card = CardWidget(rank=rank, suit_image=suit_image)
+            cardsP4Widget.append(card)
+
+        for card in cardsP1Widget:
+            layout.add_widget(card)
+        for card in cardsP2Widget:
+            layout.add_widget(card)
+        for card in cardsP3Widget:
+            layout.add_widget(card)
+        for card in cardsP4Widget:
             layout.add_widget(card)
 
         scroll_view = ScrollView(size_hint=(None, None), size=(1000, 800))
@@ -82,4 +129,12 @@ class CardDeckApp(App):
         return disp
 
 if __name__ == "__main__":
+    p1 = "A"
+    p2 = "B"
+    p3 = "C"
+    p4 = "D"
+    players = [p1,p2,p3,p4]
+    
+    game=BigTwoGame(players)
+   
     CardDeckApp().run()

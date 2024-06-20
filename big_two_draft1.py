@@ -3,7 +3,7 @@ from collections import Counter
 import re
 
 class Card:
-    suits = ['Diamonds', 'Clubs', 'Hearts', 'Spades']
+    suits = ['diamonds', 'clubs', 'hearts', 'spades']
     # suits = ['D', 'C', 'H', 'S']
     ranks = ['3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A', '2']
     rank2val = {rank:i for i,rank in enumerate(ranks)}
