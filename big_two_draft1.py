@@ -206,17 +206,18 @@ class BigTwoGame:
 
         # self.display_winner(cur_player)
 
-    def play_game_play(self,card_to_play):
-        cards_before_play = self.cur_player.hand.copy()
-        self.play_turn(self.cur_player, self.cur_card, card_to_play)                            # current player plays card
-        self.cur_card = list(set(cards_before_play) - set(self.cur_player.hand))
-        self.cur_player = self.next_player(self.cur_player)   # find next player
-        if self.game_over():
-            self.display_winner(self.cur_player)
-
-    def play_game_skip(self):
-        self.cur_player = self.next_player(self.cur_player)
-
+    def play_game_play(self,cards_to_play):
+        if cards_to_play:
+            cards_before_play = self.cur_player.hand.copy()
+            self.play_turn(self.cur_player, self.cur_card, cards_to_play)                            # current player plays card
+            self.cur_card = list(set(cards_before_play) - set(self.cur_player.hand))
+            self.cur_player = self.next_player(self.cur_player)   # find next player
+            if self.game_over():
+                self.display_winner(self.cur_player)
+        
+        else:
+            self.cur_player = self.next_player(self.cur_player)    
+ 
     def starting_player(self):
         for player in self.players:
             for card in player.hand:

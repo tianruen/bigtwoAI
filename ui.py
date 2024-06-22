@@ -19,7 +19,12 @@ class imgbtn(ButtonBehavior, Image):
         CardDeckApp.l1.text = self.source
 
         if self.source == 'next.png':
-            game.play_game_skip()
+            game.play_game_play(UI.selected_card)
+            UI.selected_card = ""
+            for card in UI.selected_card_UI:
+                card.parent.remove_widget(card)
+            UI.selected_card_UI = []
+            
         else:
             suit = self.source
             if suit == 'diamonds.png':
@@ -33,10 +38,8 @@ class imgbtn(ButtonBehavior, Image):
             card = self.parent
             rank = card.rank_label.text
 
-            card_to_play = f"{rank}{suit}"
-            game.play_game_play(card_to_play)
-
-            card.parent.remove_widget(card)
+            UI.selected_card = UI.selected_card + f" {rank}{suit}"
+            UI.selected_card_UI.append(card)
         
 
 class lblbtn(ButtonBehavior, Label):
@@ -59,7 +62,8 @@ class lblbtn(ButtonBehavior, Label):
         card_to_play = f"{rank}{suit}"
         game.play_game_play(card_to_play)
 
-        card.parent.remove_widget(card)
+        UI.selected_card = UI.selected_card + f" {rank}{suit}"
+        UI.selected_card_UI.append(card)
 
 
 
@@ -100,7 +104,7 @@ class CardDeckApp(App):
         # deck = Deck()
         # cards = deck.get_cards()
 
-        boxP1 = BoxLayout(orientation='horizontal', spacing=80)
+        boxP1 = BoxLayout(orientation='horizontal', spacing=50)
         layout.add_widget(boxP1)
         cardsP1 = game.players[0].hand
         cardsP1Widget = []
@@ -111,7 +115,7 @@ class CardDeckApp(App):
             card = CardWidget(rank=rank, suit_image=suit_image)
             cardsP1Widget.append(card)
 
-        boxP2 = BoxLayout(orientation='horizontal', spacing=80)
+        boxP2 = BoxLayout(orientation='horizontal', spacing=50)
         layout.add_widget(boxP2)
         cardsP2 = game.players[1].hand
         cardsP2Widget = []
@@ -122,7 +126,7 @@ class CardDeckApp(App):
             card = CardWidget(rank=rank, suit_image=suit_image)
             cardsP2Widget.append(card)
         
-        boxP3 = BoxLayout(orientation='horizontal', spacing=80)
+        boxP3 = BoxLayout(orientation='horizontal', spacing=50)
         layout.add_widget(boxP3)
         cardsP3 = game.players[2].hand
         cardsP3Widget = []
@@ -133,7 +137,7 @@ class CardDeckApp(App):
             card = CardWidget(rank=rank, suit_image=suit_image)
             cardsP3Widget.append(card)
         
-        boxP4 = BoxLayout(orientation='horizontal', spacing=80)
+        boxP4 = BoxLayout(orientation='horizontal', spacing=50)
         layout.add_widget(boxP4)
         cardsP4 = game.players[3].hand
         cardsP4Widget = []
@@ -182,6 +186,8 @@ class CardDeckApp(App):
         disp = GridLayout(cols = 1)
         disp.add_widget(root)
 
+        self.selected_card = ""
+        self.selected_card_UI = []
         return disp
 
 if __name__ == "__main__":
