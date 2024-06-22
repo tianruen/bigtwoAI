@@ -188,6 +188,7 @@ class BigTwoGame:
     def play_game(self):
         cur_player = self.starting_player()               # find the starting player
         cur_card = None
+        skip_time = 0
         while not self.game_over():
             print(f"{cur_player.name}'s turn")
             print(f"{cur_player.name}'s cards: {cur_player.hand}")
@@ -196,15 +197,20 @@ class BigTwoGame:
             playing = input("Do you want to play cards? (y/n): ").lower()
 
             if playing == 'y':
+                skip_time = 0
                 cards_before_play = cur_player.hand.copy()
                 self.play_turn(cur_player, cur_card)                  # current player plays card
                 cur_card = list(set(cards_before_play) - set(cur_player.hand))
-                cur_player = self.next_player(cur_player)   # find next player
+                # cur_player = self.next_player(cur_player)   # find next player
+                if self.game_over():
+                    self.display_winner(cur_player)
             else:
-                cur_player = self.next_player(cur_player)
-                continue
-
-        self.display_winner(cur_player)
+                skip_time = skip_time + 1
+                # cur_player = self.next_player(cur_player)
+                if skip_time > 2:
+                    cur_card = None
+                
+            cur_player = self.next_player(cur_player)
 
     def starting_player(self):
         for player in self.players:
