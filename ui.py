@@ -7,6 +7,7 @@ from kivy.uix.label import Label
 from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.graphics import Color, Rectangle, Line
 
 from big_two_draft1 import *
 
@@ -40,6 +41,11 @@ class imgbtn(ButtonBehavior, Image):
 
             UI.selected_card = UI.selected_card + f" {rank}{suit}"
             UI.selected_card_UI.append(card)
+
+            with card.canvas.before:
+                Color(0,1,0,1)
+                card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
+
         
 
 class lblbtn(ButtonBehavior, Label):
@@ -59,17 +65,19 @@ class lblbtn(ButtonBehavior, Label):
             suit = 'H'
         elif suit == 'spades.png':
             suit = 'S'
-        card_to_play = f"{rank}{suit}"
-        game.play_game_play(card_to_play)
-
+ 
         UI.selected_card = UI.selected_card + f" {rank}{suit}"
         UI.selected_card_UI.append(card)
+
+        with card.canvas.before:
+            Color(0,1,0,1)
+            card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
 
 
 
 class CardWidget(ButtonBehavior, BoxLayout):
     def __init__(self, rank, suit_image):
-        super(CardWidget, self).__init__(orientation='vertical',padding=10,spacing=10)
+        super(CardWidget, self).__init__(orientation='vertical',spacing=10)
 
         self.rank_label = lblbtn(text=rank, font_size=50, size_hint=(None, None), size=(50, 50))
         self.suit_image = imgbtn(source=suit_image, size_hint=(None, None), size=(50, 50))
@@ -77,32 +85,11 @@ class CardWidget(ButtonBehavior, BoxLayout):
         self.add_widget(self.rank_label)
         self.add_widget(self.suit_image)
 
-    def on_press(self):
-        print("Pressed")
-        CardDeckApp.l1 = self.rank_label
-
-
-# class Deck:
-#     def __init__(self):
-#         self.cards = []
-#         suits = ['hearts', 'diamonds', 'clubs', 'spades']
-#         ranks = ['2', '3', '4', '5', '6', '7' ,'8', '9', '10','J','Q','K','A']
-#         for suit in suits:
-#             suit_image = f'{suit}.png'
-#             for rank in ranks:
-#                 card = CardWidget(rank=rank, suit_image=suit_image)
-#                 self.cards.append(card) 
-
-#     def get_cards(self):
-#         return self.cards
 
 class CardDeckApp(App):
     def build(self):
         layout = GridLayout(cols=1, padding=100, spacing=100, row_default_height=100, size_hint=(None,None), row_force_default=True)
         layout.bind(minimum_height = layout.setter('height'), minimum_width=layout.setter('width'))
-        
-        # deck = Deck()
-        # cards = deck.get_cards()
 
         boxP1 = BoxLayout(orientation='horizontal', spacing=50)
         layout.add_widget(boxP1)
