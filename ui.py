@@ -11,6 +11,7 @@ from kivy.graphics import Color, Rectangle, Line
 
 from big_two_draft1 import *
 
+import re
 
 class imgbtn(ButtonBehavior, Image):
     def __init__(self, **kwargs):
@@ -20,6 +21,7 @@ class imgbtn(ButtonBehavior, Image):
         CardDeckApp.l1.text = self.source
 
         if self.source == 'next.png':
+            print(UI.selected_card)
             game.play_game_play(UI.selected_card)
             UI.selected_card = ""
             for card in UI.selected_card_UI:
@@ -39,12 +41,24 @@ class imgbtn(ButtonBehavior, Image):
             card = self.parent
             rank = card.rank_label.text
 
-            UI.selected_card = UI.selected_card + f" {rank}{suit}"
-            UI.selected_card_UI.append(card)
+            card.selected = not card.selected
 
-            with card.canvas.before:
-                Color(0,1,0,1)
-                card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
+            if card.selected == True:
+                UI.selected_card = UI.selected_card + f" {rank}{suit}"
+                UI.selected_card_UI.append(card)
+                with card.canvas.before:
+                    Color(0,1,0,1)
+                    card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
+            
+            else:
+                card_to_be_remove = f"{rank}{suit}"
+                pattern = rf'\s*{card_to_be_remove}\s*'
+                UI.selected_card = re.sub(pattern,' ',UI.selected_card).strip()
+                UI.selected_card_UI.remove(card)
+                with card.canvas.before:
+                    Color(0,0,0,1)
+                    card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
+          
 
         
 
@@ -84,6 +98,8 @@ class CardWidget(ButtonBehavior, BoxLayout):
         
         self.add_widget(self.rank_label)
         self.add_widget(self.suit_image)
+
+        self.selected = False
 
 
 class CardDeckApp(App):
