@@ -121,7 +121,7 @@ class Hand:
             return Card.rank2val[self.cards[-1].rank] > Card.rank2val[cards2[-1].rank]
 
     def compare5(self, cards2):
-        cards2 = self.cards(cards2)
+        cards2 = self.sort_cards(cards2)
 
         c1_pattern = self.five_cards_pattern(self.cards)
         c2_pattern = self.five_cards_pattern(cards2)
