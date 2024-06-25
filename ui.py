@@ -18,15 +18,38 @@ class imgbtn(ButtonBehavior, Image):
         super(imgbtn, self).__init__(**kwargs)
 
     def on_press(self):
-        CardDeckApp.l1.text = self.source
 
+        # Carry out this part logic if player decided and click next
         if self.source == 'next.png':
+            # Pass selected card into game logic
             print(UI.selected_card)
             game.play_game_play(UI.selected_card)
             UI.selected_card = ""
+
+            # Update UI
+
+            # If new card is selected or 3 players skip,
+            # Clear the Cards on Table output
+            if UI.selected_card_UI or game.skip_time > 2:
+                UI.cardPlayed.clear_widgets()
+
+            # Remove the selected card from player deck
             for card in UI.selected_card_UI:
                 card.parent.remove_widget(card)
+
+                # Now include the selected card into side screen,
+                # but we need to remove the border first
+                # Because when we select a card we also set a border around the widget
+                with card.canvas.before:
+                    card.canvas.before.remove(card.border)
+                UI.cardPlayed.add_widget(card) 
+
             UI.selected_card_UI = []
+
+            # Update player to play
+            playerGoingNow = game.cur_player.name
+            UI.playerNow.text = f"Player Now: {playerGoingNow}"
+            
             
         else:
             suit = self.source
@@ -67,7 +90,6 @@ class lblbtn(ButtonBehavior, Label):
         super(lblbtn, self).__init__(**kwargs)
 
     def on_press(self):
-        CardDeckApp.l1.text = self.text
         rank = self.text
         card = self.parent
         suit = card.suit_image.source
@@ -80,12 +102,23 @@ class lblbtn(ButtonBehavior, Label):
         elif suit == 'spades.png':
             suit = 'S'
  
-        UI.selected_card = UI.selected_card + f" {rank}{suit}"
-        UI.selected_card_UI.append(card)
+        card.selected = not card.selected
 
-        with card.canvas.before:
-            Color(0,1,0,1)
-            card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
+        if card.selected == True:
+            UI.selected_card = UI.selected_card + f" {rank}{suit}"
+            UI.selected_card_UI.append(card)
+            with card.canvas.before:
+                Color(0,1,0,1)
+                card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
+        
+        else:
+            card_to_be_remove = f"{rank}{suit}"
+            pattern = rf'\s*{card_to_be_remove}\s*'
+            UI.selected_card = re.sub(pattern,' ',UI.selected_card).strip()
+            UI.selected_card_UI.remove(card)
+            with card.canvas.before:
+                Color(0,0,0,1)
+                card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
 
 
 
@@ -104,11 +137,10 @@ class CardWidget(ButtonBehavior, BoxLayout):
 
 class CardDeckApp(App):
     def build(self):
-        layout = GridLayout(cols=1, padding=100, spacing=100, row_default_height=100, size_hint=(None,None), row_force_default=True)
-        layout.bind(minimum_height = layout.setter('height'), minimum_width=layout.setter('width'))
-
-        boxP1 = BoxLayout(orientation='horizontal', spacing=50)
-        layout.add_widget(boxP1)
+        # From here until the next HERE:
+        # Just repetition for the 4 players
+        # to create a list of cardsP*Widget
+        # that contains the 13 cards widget
         cardsP1 = game.players[0].hand
         cardsP1Widget = []
         for card in cardsP1:
@@ -118,8 +150,6 @@ class CardDeckApp(App):
             card = CardWidget(rank=rank, suit_image=suit_image)
             cardsP1Widget.append(card)
 
-        boxP2 = BoxLayout(orientation='horizontal', spacing=50)
-        layout.add_widget(boxP2)
         cardsP2 = game.players[1].hand
         cardsP2Widget = []
         for card in cardsP2:
@@ -128,9 +158,7 @@ class CardDeckApp(App):
             suit_image = f'{suit}.png'
             card = CardWidget(rank=rank, suit_image=suit_image)
             cardsP2Widget.append(card)
-        
-        boxP3 = BoxLayout(orientation='horizontal', spacing=50)
-        layout.add_widget(boxP3)
+                
         cardsP3 = game.players[2].hand
         cardsP3Widget = []
         for card in cardsP3:
@@ -140,8 +168,6 @@ class CardDeckApp(App):
             card = CardWidget(rank=rank, suit_image=suit_image)
             cardsP3Widget.append(card)
         
-        boxP4 = BoxLayout(orientation='horizontal', spacing=50)
-        layout.add_widget(boxP4)
         cardsP4 = game.players[3].hand
         cardsP4Widget = []
         for card in cardsP4:
@@ -149,43 +175,83 @@ class CardDeckApp(App):
             suit = card.suit
             suit_image = f'{suit}.png'
             card = CardWidget(rank=rank, suit_image=suit_image)
-            cardsP4Widget.append(card)        
+            cardsP4Widget.append(card)
         
+        #############################   HERE!   #############################
+
+
+        # From here until the next HERE:
+        # Just repetition for the 4 players
+        # to create a layout that
+        # include 4 layouts to accomodate the 4 players that each
+        # add 13 card widgets into itself
+
+        # Create a layout to put the 4 decks of card
+        layout = GridLayout(cols=1, padding=100, spacing=100, row_default_height=100, size_hint=(None,None), row_force_default=True)
+        layout.bind(minimum_height = layout.setter('height'), minimum_width=layout.setter('width'))
+
+        # Create individual layout and add 13 card widgets into it and a next button
+        boxP1 = BoxLayout(orientation='horizontal', spacing=50)
+        layout.add_widget(boxP1)
         for card in cardsP1Widget:
             boxP1.add_widget(card)
         next_button_P1 = BoxLayout(orientation='vertical', padding=(0, 0, 0, 40))
         next_button_P1.add_widget(imgbtn(source='next.png', size_hint=(None, None), size=(50, 50)))
         boxP1.add_widget(next_button_P1)
 
+        boxP2 = BoxLayout(orientation='horizontal', spacing=50)
+        layout.add_widget(boxP2)
         for card in cardsP2Widget:
             boxP2.add_widget(card)
         next_button_P2 = BoxLayout(orientation='vertical', padding=(0, 0, 0, 40))
         next_button_P2.add_widget(imgbtn(source='next.png', size_hint=(None, None), size=(50, 50)))
         boxP2.add_widget(next_button_P2)
 
+        boxP3 = BoxLayout(orientation='horizontal', spacing=50)
+        layout.add_widget(boxP3)
         for card in cardsP3Widget:
             boxP3.add_widget(card)
         next_button_P3 = BoxLayout(orientation='vertical', padding=(0, 0, 0, 40))
         next_button_P3.add_widget(imgbtn(source='next.png', size_hint=(None, None), size=(50, 50)))
         boxP3.add_widget(next_button_P3)
 
+        boxP4 = BoxLayout(orientation='horizontal', spacing=50)
+        layout.add_widget(boxP4)
         for card in cardsP4Widget:
             boxP4.add_widget(card)
         next_button_P4 = BoxLayout(orientation='vertical', padding=(0, 0, 0, 40))
         next_button_P4.add_widget(imgbtn(source='next.png', size_hint=(None, None), size=(50, 50)))
         boxP4.add_widget(next_button_P4)
-
+        
+        #############################   HERE!   #############################
+        
+        # Put the big layout into a scrollable widget
         scroll_view = ScrollView(size_hint=(None, None), size=(1000, 800))
         scroll_view.add_widget(layout)
 
         root = BoxLayout(orientation='horizontal')
         root.add_widget(scroll_view)
 
-        CardDeckApp.l1 = Label(text='Test', font_size=32)
-       
-        root.add_widget(CardDeckApp.l1)
         
         
+        # Display card and player here
+        self.playerNow = Label(text='Player Now', font_size = 32)
+        spacer = Widget(size_hint_y=None, height=50)
+        cardNow = Label(text='Card on table:', font_size = 32)
+        self.cardPlayed = GridLayout(cols=5, padding=100, spacing=100, row_default_height=100, size_hint=(None,None), row_force_default=True)
+
+        playData = GridLayout(cols=1, padding=100, spacing=100, size_hint=(None,None), row_force_default=True,size=(400, 800))
+        
+        playData.add_widget(self.playerNow)
+        playData.add_widget(spacer)
+        playData.add_widget(cardNow)
+        playData.add_widget(self.cardPlayed)
+
+        root.add_widget(playData)
+        
+        
+        
+        # Final output!
         disp = GridLayout(cols = 1)
         disp.add_widget(root)
 
