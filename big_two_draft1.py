@@ -210,20 +210,26 @@ class BigTwoGame:
     def play_game_play(self,cards_to_play):
         if cards_to_play:
             self.skip_time = 0
+            self.checkPassForUI = True
             cards_before_play = self.cur_player.hand.copy()
             self.play_turn(self.cur_player, self.cur_card, cards_to_play)                            # current player plays card
-            self.cur_card = list(set(cards_before_play) - set(self.cur_player.hand))
-            if self.game_over():
-                self.display_winner(self.cur_player)
-        
+            if self.checkPassForUI == True:
+                self.cur_card = list(set(cards_before_play) - set(self.cur_player.hand))
+                if self.game_over():
+                    self.display_winner(self.cur_player)
+                else:
+                    self.cur_player = self.next_player(self.cur_player)
+            
+            else:
+                pass
+            
         else:
             self.skip_time = self.skip_time + 1
             # cur_player = self.next_player(cur_player)
             if self.skip_time > 2:
                 self.cur_card = None
-        
-        self.cur_player = self.next_player(self.cur_player)    
- 
+            self.cur_player = self.next_player(self.cur_player)
+         
     def starting_player(self):
         for player in self.players:
             for card in player.hand:
@@ -271,8 +277,9 @@ class BigTwoGame:
         # print(f"exist: {exist}")
 
         if not valid or not bigger or not exist:
-            self.play_turn(player, cur_cards)
+            self.checkPassForUI = False
         else:
+            self.checkPassForUI = True
             # print(cards_to_play, c_list)
             player.play_cards(c_list)
             # print(f"{player.name} played: {cards_to_play}")

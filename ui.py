@@ -1,13 +1,11 @@
 from kivy.app import App
-from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
-from kivy.uix.widget import Widget
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.behaviors import ButtonBehavior
-from kivy.graphics import Color, Rectangle, Line
+from kivy.graphics import Color, Line
 
 from big_two_draft1 import *
 
@@ -18,33 +16,41 @@ class imgbtn(ButtonBehavior, Image):
         super(imgbtn, self).__init__(**kwargs)
 
     def on_press(self):
-
+            
+        UI.maybeNahBruv.text = " "
+        
         # Carry out this part logic if player decided and click next
         if self.source == 'next.png':
             # Pass selected card into game logic
-            print(UI.selected_card)
+            # print(UI.selected_card)
             game.play_game_play(UI.selected_card)
-            UI.selected_card = ""
+            
+            if game.checkPassForUI == True:
+                # Update UI
+                
+                # If new card is selected or 3 players skip,
+                # Clear the Cards on Table output
+                if UI.selected_card_UI or game.skip_time > 2:
+                    UI.cardPlayed.clear_widgets()
 
-            # Update UI
+                # Remove the selected card from player deck
+                for card in UI.selected_card_UI:
+                    card.parent.remove_widget(card)
 
-            # If new card is selected or 3 players skip,
-            # Clear the Cards on Table output
-            if UI.selected_card_UI or game.skip_time > 2:
-                UI.cardPlayed.clear_widgets()
+                    # Now include the selected card into side screen,
+                    # but we need to remove the border first
+                    # Because when we select a card we also set a border around the widget
+                    with card.canvas.before:
+                        card.canvas.before.remove(card.border)
+                    UI.cardPlayed.add_widget(card)
+                
+                UI.selected_card = ""
+                UI.selected_card_UI = []
+                
 
-            # Remove the selected card from player deck
-            for card in UI.selected_card_UI:
-                card.parent.remove_widget(card)
-
-                # Now include the selected card into side screen,
-                # but we need to remove the border first
-                # Because when we select a card we also set a border around the widget
-                with card.canvas.before:
-                    card.canvas.before.remove(card.border)
-                UI.cardPlayed.add_widget(card) 
-
-            UI.selected_card_UI = []
+            else:
+                UI.maybeNahBruv.text = "NAH BRUV!"
+            
 
             # Update player to play
             playerGoingNow = game.cur_player.name
@@ -79,8 +85,7 @@ class imgbtn(ButtonBehavior, Image):
                 UI.selected_card = re.sub(pattern,' ',UI.selected_card).strip()
                 UI.selected_card_UI.remove(card)
                 with card.canvas.before:
-                    Color(0,0,0,1)
-                    card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
+                    card.canvas.before.remove(card.border)
           
 
         
@@ -117,8 +122,7 @@ class lblbtn(ButtonBehavior, Label):
             UI.selected_card = re.sub(pattern,' ',UI.selected_card).strip()
             UI.selected_card_UI.remove(card)
             with card.canvas.before:
-                Color(0,0,0,1)
-                card.border = Line(width=2, rectangle=(card.x, card.y, 50, card.height))
+                card.canvas.before.remove(card.border)
 
 
 
@@ -235,15 +239,18 @@ class CardDeckApp(App):
         
         
         # Display card and player here
-        self.playerNow = Label(text='Player Now', font_size = 32)
-        spacer = Widget(size_hint_y=None, height=50)
+        self.playerNow = Label(text='', font_size = 32)
+        playerGoingNow = game.cur_player.name
+        self.playerNow.text = f"Player Now: {playerGoingNow}"
+
+        self.maybeNahBruv = Label(text = "", halign='center', color=(1, 0, 0, 1), size_hint_y=None, height=50, font_size = 48)
         cardNow = Label(text='Card on table:', font_size = 32)
         self.cardPlayed = GridLayout(cols=5, padding=100, spacing=100, row_default_height=100, size_hint=(None,None), row_force_default=True)
 
         playData = GridLayout(cols=1, padding=100, spacing=100, size_hint=(None,None), row_force_default=True,size=(400, 800))
         
         playData.add_widget(self.playerNow)
-        playData.add_widget(spacer)
+        playData.add_widget(self.maybeNahBruv)
         playData.add_widget(cardNow)
         playData.add_widget(self.cardPlayed)
 
