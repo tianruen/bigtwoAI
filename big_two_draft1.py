@@ -121,7 +121,7 @@ class Hand:
             return Card.rank2val[self.cards[-1].rank] > Card.rank2val[cards2[-1].rank]
 
     def compare5(self, cards2):
-        cards2 = self.cards(cards2)
+        cards2 = self.sort_cards(cards2)
 
         c1_pattern = self.five_cards_pattern(self.cards)
         c2_pattern = self.five_cards_pattern(cards2)
@@ -188,6 +188,7 @@ class BigTwoGame:
     def play_game(self):
         cur_player = self.starting_player()               # find the starting player
         cur_card = None
+        skip_time = 0
         while not self.game_over():
             print(f"{cur_player.name}'s turn")
             print(f"{cur_player.name}'s cards: {cur_player.hand}")
@@ -196,11 +197,15 @@ class BigTwoGame:
             playing = input("Do you want to play cards? (y/n): ").lower()
 
             if playing == 'y':
+                skip_time = 0
                 cards_before_play = cur_player.hand.copy()
                 self.play_turn(cur_player, cur_card)                  # current player plays card
                 cur_card = list(set(cards_before_play) - set(cur_player.hand))
                 cur_player = self.next_player(cur_player)   # find next player
             else:
+                skip_time = skip_time + 1
+                if skip_time > 2:
+                    cur_card = None
                 cur_player = self.next_player(cur_player)
                 continue
 
