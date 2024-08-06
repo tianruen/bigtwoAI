@@ -187,50 +187,7 @@ class BigTwoGame:
     def play_game(self):
         self.cur_player = self.starting_player()               # find the starting player
         self.cur_card = None
-        skip_time = 0
     
-    
-        #AI# Need to change this, this does not run automatically..
-        #AI# This executes everytime a node extend a child... (When an action is played)
-
-
-        #AI# Skip is also a part of the game that needs to be exported?
-        #AI# Or maybe not.. Implied by self.cur_card...
-        #AI# Actually we just need an input of actions done, and then check cur_card and game_done?
-
-        #AI# Card played and player hands is also a part of the game that needs to be exported?
-        
-        while not self.game_over():
-            print(f"{self.cur_player.name}'s turn")
-            print(f"{self.cur_player.name}'s cards: {self.cur_player.hand}")
-            print(f"Cards on table: {self.cur_card}")
-
-            self.playing = input("Do you want to play cards? (y/n): ").lower()
-
-            if self.playing == 'y':
-                skip_time = 0
-                cards_before_play = self.cur_player.hand.copy()
-                
-                #AI# This arrangement allows a better entry point to input card play from AI people?
-                cards_to_play = input("Please input the card(s). Rank first then suit (e.g. 9D for 9 of Diamonds) :")
-                cards_to_play = re.findall(r"([^,\s]+)", cards_to_play)
-                # alternatively can use: card_to_play = card_to_play.split(",") (but whitespace won't be ignore)
-
-                #AI# This arrangement allows a better entry point to input card play from AI people?
-                self.observation = self.play_turn(self.cur_player, self.cur_card, cards_to_play)                    # current player plays card
-                                                                                                                    #AI# and returns observation : hands played
-                
-                self.cur_card = list(set(cards_before_play) - set(self.cur_player.hand))
-                self.cur_player = self.next_player(self.cur_player)   # find next player
-            else:
-                skip_time = skip_time + 1
-                if skip_time > 2:
-                    self.cur_card = None
-                self.cur_player = self.next_player(self.cur_player)
-                continue
-
-        self.display_winner(self.cur_player)
-
     def starting_player(self):
         for player in self.players:
             for card in player.hand:
@@ -238,6 +195,43 @@ class BigTwoGame:
                     return player
         return self.players[0]
     
+        #AI# Skip is also a part of the game that needs to be exported?
+        #AI# Or maybe not.. Implied by self.cur_card...
+        #AI# Actually we just need an input of actions done, and then check cur_card and game_done?
+
+        #AI# Card played and player hands is also a part of the game that needs to be exported?
+    
+    # To be execute when an action is played (node extend a child)
+    def proceed(self, cards_to_play):
+        print(f"{self.cur_player.name}'s turn")
+        print(f"{self.cur_player.name}'s cards: {self.cur_player.hand}")
+        print(f"Cards on table: {self.cur_card}")
+
+        if cards_to_play:
+            self.skip_time = 0
+            cards_before_play = self.cur_player.hand.copy()
+            
+            cards_to_play = re.findall(r"([^,\s]+)", cards_to_play)
+            # alternatively can use: card_to_play = card_to_play.split(",") (but whitespace won't be ignore)
+
+            # Return Hand - Played card is valid, and added to the played deck. Results feed back to AI
+            self.observation = self.play_turn(self.cur_player, self.cur_card, cards_to_play)                    # current player plays card
+
+            self.cur_card = list(set(cards_before_play) - set(self.cur_player.hand))
+            
+            if self.game_over():
+                self.display_winner(self.cur_player)
+            else:
+                print(f"Cards played by {self.cur_player.name}: {self.cur_card}")
+                self.cur_player = self.next_player(self.cur_player)   # find next player
+        
+        else:
+            self.skip_time = self.skip_time + 1
+            if self.skip_time > 2:
+                self.cur_card = None
+            self.cur_player = self.next_player(self.cur_player)
+
+
     def next_player(self, cur_player):
         cur_index = self.players.index(cur_player)
         return self.players[(cur_index + 1) % len(self.players)]
@@ -274,7 +268,7 @@ class BigTwoGame:
         # print(f"exist: {exist}")
 
         if not valid or not bigger or not exist:
-            self.play_turn(player, cur_cards)
+            self.play_turn(player, cur_cards, cards_to_play)
         else:
             # print(cards_to_play, c_list)
             player.play_cards(c_list)
