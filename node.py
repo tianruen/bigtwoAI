@@ -59,3 +59,47 @@ def born(self):
         # Then create a child node
         child = Node(game, observation, done, self, action)
 
+
+def choose_action(card_length):
+    
+    game.cur_player.hand = game.cur_player.hand.sort_cards(game.cur_player.hand.cards)
+    
+    available_moves = []
+    cur_hand = game.cur_player.hand
+    
+    
+    if card_length == 1:
+        cur_card_rank = Card.rank2val[game.cur_card.rank]
+        cur_card_suit = Card.suit2val[game.cur_card.suit]
+        
+        for i in cur_hand:
+            r = Card.rank2val[i.rank]
+            if r > cur_card_rank:
+                available_moves.append(i)       # This includes the card that can be played... is this a good way?
+            
+            elif r = cur_card_rank:
+                s = Card.suit2val[i.suit]
+                if s > cur_card_suit:
+                    available_moves.append(i)   # This includes the card that can be played... is this a good way?
+    
+    elif card_length == 2:
+    
+        ###After compare rank, compare smallest suit?
+        
+    elif card_length == 3:
+        ###Just compare suit
+        
+        ###Take inspiration fromm compare123, compare5
+        
+
+if __name__ == "__main__":
+    p1 = input("First player name: ")
+    p2 = input("Second player name: ")
+    p3 = input("Third player name: ")
+    p4 = input("Fourth player name: ")
+    players = [p1,p2,p3,p4]
+
+    game = BigTwoGame(players)
+    game.play_game()        
+
+# Do a play, with one player as AI, choosing card randomly
