@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 class Node:
 
     '''
@@ -77,20 +79,41 @@ def choose_action(card_length):
             if r > cur_card_rank:
                 available_moves.append(i)       # This includes the card that can be played... is this a good way?
             
-            elif r = cur_card_rank:
+            elif r == cur_card_rank:
                 s = Card.suit2val[i.suit]
                 if s > cur_card_suit:
                     available_moves.append(i)   # This includes the card that can be played... is this a good way?
     
-    elif card_length == 2:
+    elif card_length == 2 or card_length == 3:
     
         ###After compare rank, compare smallest suit?
+        cur_rank = Card.rank2val[game.cur_card.rank]
+        cur_suit = Card.suit2val[game.cur_card.suit]
+        ### Change this to determine what suit and rank to compare
+        
+        ##How to re-use compare123 and compare5, just figure out how to make combination ?
         
     elif card_length == 3:
         ###Just compare suit
         
         ###Take inspiration fromm compare123, compare5
         
+def filter_cards_combinations(player_hand,card_length, cur_rank, cur_suit):
+    
+    grouped_cards = defaultdict(list)
+        
+    for card in player_hand:
+        r = Card.rank2val[cards.rank]
+        
+        ##Implement logic to compare cur_rank and cur_suit
+            grouped_cards[r].append(card)
+        
+    filtered_groups = [group for group in grouped_cards.values() if  len(group) >= card_length)
+    
+    # Logic for choosing available conditions if len(group) > card_length
+    # For example, choose available grouping for 3D, 3C, 3H when cur_card is double
+    
+    return filtered_groups
 
 if __name__ == "__main__":
     p1 = input("First player name: ")
