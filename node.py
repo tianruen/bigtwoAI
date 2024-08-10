@@ -1,4 +1,5 @@
 from collections import defaultdict
+import itertools
 
 class Node:
 
@@ -62,58 +63,61 @@ def born(self):
         child = Node(game, observation, done, self, action)
 
 
-def choose_action(card_length):
-    
-    game.cur_player.hand = game.cur_player.hand.sort_cards(game.cur_player.hand.cards)
+def choose_action():
     
     available_moves = []
-    cur_hand = game.cur_player.hand
+    cur_cards = game.cur_card
+    cards_length = len(cur_cards)
+    player_hand = game.cur_player.hand
     
-    
-    if card_length == 1:
-        cur_card_rank = Card.rank2val[game.cur_card.rank]
-        cur_card_suit = Card.suit2val[game.cur_card.suit]
-        
-        for i in cur_hand:
-            r = Card.rank2val[i.rank]
-            if r > cur_card_rank:
-                available_moves.append(i)       # This includes the card that can be played... is this a good way?
-            
-            elif r == cur_card_rank:
-                s = Card.suit2val[i.suit]
-                if s > cur_card_suit:
-                    available_moves.append(i)   # This includes the card that can be played... is this a good way?
+    if cards_length == 1:
+        for tobeplay_card in player_hand:
+            hand = Hand(tobeplay_card)
+            if hand.compare(cur_cards):
+                available_moves.append(tobeplay_card)
     
     elif card_length == 2 or card_length == 3:
     
-        ###After compare rank, compare smallest suit?
-        cur_rank = Card.rank2val[game.cur_card.rank]
-        cur_suit = Card.suit2val[game.cur_card.suit]
-        ### Change this to determine what suit and rank to compare
+        combinations = filter_cards_combinations(player_hand, card_length)
+        for tobeplay_combo in combinations:
+            hand = Hand(tobeplay_combo)
+            if hand.compare(cur_cards):
+                available_moves.append(tobeplay_combo)
         
-        ##How to re-use compare123 and compare5, just figure out how to make combination ?
         
-    elif card_length == 3:
-        ###Just compare suit
-        
-        ###Take inspiration fromm compare123, compare5
-        
-def filter_cards_combinations(player_hand,card_length, cur_rank, cur_suit):
+def filter_cards_combinations(player_hand, card_length):
     
     grouped_cards = defaultdict(list)
-        
+    
+    ## Group all cards with same rank 
     for card in player_hand:
-        r = Card.rank2val[cards.rank]
-        
-        ##Implement logic to compare cur_rank and cur_suit
-            grouped_cards[r].append(card)
-        
-    filtered_groups = [group for group in grouped_cards.values() if  len(group) >= card_length)
+        r = Card.rank2val[card.rank]
+        grouped_cards[r].append(card)
     
-    # Logic for choosing available conditions if len(group) > card_length
-    # For example, choose available grouping for 3D, 3C, 3H when cur_card is double
+    ## Filter away group with quantity lower than current card_length
+    ## They can't be played
+    temp_filtered_groups = [group for group in grouped_cards.values() if len(group) >= card_length)
+    filtered_groups = []
     
-    return filtered_groups
+    for group in temp_filtered_groups:
+        
+        ## Just include the group if they have the same quantity as current card_length
+        if len(group) == card_length:
+            filtered_groups.append(group)
+        
+        
+        # If a rank has more cards than card_length, 
+        # consider all case
+        # Example: card_length is 2, but we have 3D, 3C, 3H
+        # We include all combinations into filtered_cards_combo
+        
+        elif len(group) > card_length:
+            combinations = list(itertools.combinations(group, card_length)
+            for combo in combinations:
+                fitlered_cards_combo.append(combo)
+    
+    
+    return filtered_cards_combo
 
 if __name__ == "__main__":
     p1 = input("First player name: ")

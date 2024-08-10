@@ -262,7 +262,7 @@ class BigTwoGame:
 
         hand = Hand(c_list)
         valid = hand.is_valid(cur_cards)
-        bigger = hand.compare(cur_cards)
+        bigger = hand.compare(cur_cards)            #hand is card chosen by player, cur_cards is card on table
         # print(f"valid: {valid}")
         # print(f"bigger: {bigger}")
         # print(f"exist: {exist}")
