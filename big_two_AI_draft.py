@@ -125,6 +125,9 @@ class Hand:
         c1_pattern = self.five_cards_pattern(self.cards)
         c2_pattern = self.five_cards_pattern(cards2)
 
+
+        # First compare which pattern is bigger
+        # If they are the same we figure out who wins
         if c1_pattern[0] == c2_pattern[0]:
             if c1_pattern[0] == 4 or c1_pattern[0] == 1:    # royal flush / tong hua shun or same pattern / tong hua
                 if c1_pattern[1] == c2_pattern[1]: # same suit
@@ -139,6 +142,7 @@ class Hand:
                 else:
                     return c1_pattern[2] > c2_pattern[2] # check rank value
 
+        # Else we declare winner based on which pattern bigger
         else:
             return c1_pattern[0] > c2_pattern[0]
 
@@ -237,23 +241,15 @@ class BigTwoGame:
         return self.players[(cur_index + 1) % len(self.players)]
     
     def play_turn(self, player, cur_cards, cards_to_play):
-        c_list = []
-        for c in cards_to_play:
-            if c[-1] == 'D':
-                s = 'Diamonds'
-            elif c[-1] == 'C':
-                s = 'Clubs'
-            elif c[-1] == 'H':
-                s = 'Hearts'
-            elif c[-1] == 'S':
-                s = 'Spades'
-            
-            if c[0] == '1':
-                r = '10'
-            else:
-                r = c[0]
-            c_list.append(Card(s,r))
         
+        c_list = []
+        
+        for c in cards_to_play:
+            c_list.append(c)
+
+
+        
+        ######### DONT NEED THIS? AI wont play wrong gua? ###########
         exist = True
         for c in c_list:
             if c not in player.hand:
