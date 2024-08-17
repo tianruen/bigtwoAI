@@ -207,15 +207,15 @@ class BigTwoGame:
     
     # To be execute when an action is played (node extend a child)
     def proceed(self, cards_to_play):
-        print(f"{self.cur_player.name}'s turn")
-        print(f"{self.cur_player.name}'s cards: {self.cur_player.hand}")
-        print(f"Cards on table: {self.cur_card}")
+        # print(f"{self.cur_player.name}'s turn")
+        # print(f"{self.cur_player.name}'s cards: {self.cur_player.hand}")
+        # print(f"Cards on table: {self.cur_card}")
 
         if cards_to_play:
             self.skip_time = 0
             cards_before_play = self.cur_player.hand.copy()
             
-            cards_to_play = re.findall(r"([^,\s]+)", cards_to_play)
+            # cards_to_play = re.findall(r"([^,\s]+)", cards_to_play)
             # alternatively can use: card_to_play = card_to_play.split(",") (but whitespace won't be ignore)
 
             # Return Hand - Played card is valid, and added to the played deck. Results feed back to AI
@@ -231,6 +231,7 @@ class BigTwoGame:
         
         else:
             self.skip_time = self.skip_time + 1
+            print(f"Cards played by {self.cur_player.name}: Skipped!")
             if self.skip_time > 2:
                 self.cur_card = None
             self.cur_player = self.next_player(self.cur_player)
@@ -269,7 +270,7 @@ class BigTwoGame:
             # print(cards_to_play, c_list)
             player.play_cards(c_list)
             # print(f"{player.name} played: {cards_to_play}")
-            print(f"{player.name} played: {c_list}")
+            # print(f"{player.name} played: {c_list}")
             return hand
 
     def game_over(self):

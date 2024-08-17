@@ -5,7 +5,7 @@ class Actions:
 
     def available_actions(game):
         
-        available_moves = []
+        available_moves = [None]
         
         cur_cards = game.cur_card
         cards_length = len(cur_cards)
