@@ -219,7 +219,7 @@ class BigTwoGame:
             # alternatively can use: card_to_play = card_to_play.split(",") (but whitespace won't be ignore)
 
             # Return Hand - Played card is valid, and added to the played deck. Results feed back to AI
-            self.observation = self.play_turn(self.cur_player, self.cur_card, cards_to_play)                    # current player plays card
+            self.play_turn(self.cur_player, self.cur_card, cards_to_play)                    # current player plays card
 
             self.cur_card = list(set(cards_before_play) - set(self.cur_player.hand))
             
@@ -271,7 +271,7 @@ class BigTwoGame:
             player.play_cards(c_list)
             # print(f"{player.name} played: {cards_to_play}")
             # print(f"{player.name} played: {c_list}")
-            return hand
+            # return hand               # Probabby not needed?
 
     def game_over(self):
         return any([len(player.hand) == 0 for player in self.players])
