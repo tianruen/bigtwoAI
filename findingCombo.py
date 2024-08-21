@@ -5,12 +5,12 @@ import itertools
 class Combo:
     
     ############ DOUBLE or TRIPLE ############
-    def filter_cards_combinations_23(player_hand, card_length):
+    def filter_cards_combinations_23(playing_hand, card_length):
         
         grouped_cards_rank = defaultdict(list)
         
         ## Group all cards with same rank 
-        for card in player_hand:
+        for card in playing_hand:
             r = card.rank
             grouped_cards_rank[r].append(card)
         
@@ -32,18 +32,18 @@ class Combo:
 
     
     ############ FIVE CARDS ############
-    def filter_cards_combinations_5(player_hand):
+    def filter_cards_combinations_5(playing_hand):
         
         grouped_cards_rank = defaultdict(list)
         grouped_cards_suit = defaultdict(list)
         five_card_combo = []
         
         ## Group all cards with same rank 
-        for card in player_hand:
+        for card in playing_hand:
             r = card.rank
             grouped_cards_rank[r].append(card)
 
-        for card in player_hand:
+        for card in playing_hand:
             s = card.suit
             grouped_cards_suit[s].append(card)
         
