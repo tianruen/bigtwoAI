@@ -30,7 +30,8 @@ class Card:
 
 class Deck:
     def __init__(self):
-        self.cards = [Card(suit, rank) for suit in Card.suits for rank in Card.ranks]
+        self.preShuffledCards = [Card(suit, rank) for suit in Card.suits for rank in Card.ranks]
+        self.cards = self.preShuffledCards.copy()
         random.shuffle(self.cards)
 
     def deal(self, num_hands):
@@ -211,7 +212,7 @@ class BigTwoGame:
         # print(f"{self.cur_player.name}'s cards: {self.cur_player.hand}")
         # print(f"Cards on table: {self.cur_card}")
 
-        if cards_to_play:
+        if cards_to_play and cards_to_play[0] is not None:
             self.skip_time = 0
             cards_before_play = self.cur_player.hand.copy()
             
@@ -251,6 +252,7 @@ class BigTwoGame:
 
         
         ######### DONT NEED THIS? AI wont play wrong gua? ###########
+        ######### OR LEAVE IT? To catch flaws in AI gameplay ###########
         exist = True
         for c in c_list:
             if c not in player.hand:
