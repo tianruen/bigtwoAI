@@ -77,40 +77,45 @@ class Test:
          print(stuff)         
    
    def test_proceed_feature_in_BigTwoGame():
-      p1 = input("First player name: ")
-      p2 = input("Second player name: ")
-      p3 = input("Third player name: ")
-      p4 = input("Fourth player name: ")
-      players = [p1,p2,p3,p4]
+        p1 = "A"
+        p2 = "B"
+        p3 = "C"
+        p4 = "D"
+        players = [p1,p2,p3,p4]
 
-      game = BigTwoGame(players)
-      game.play_game()        
+        game = BigTwoGame(players)
+        game.play_game()        
 
-      while not game.game_over():
-         
-         print("\n")    
-         print(f"{game.cur_player.name}'s turn")
-         print(f"{game.cur_player.name}'s cards: {game.cur_player.hand}")
-         print(f"Cards on table: {game.cur_card}")
-         cards_to_play = input("Please input the card(s). Rank first then suit (e.g. 9D for 9 of Diamonds) :")
-         cards_to_play = re.findall(r"([^,\s]+)", cards_to_play)
-
-         c_list = []
-         for c in cards_to_play:
-            if c[-1] == 'D':
-                s = 'Diamonds'
-            elif c[-1] == 'C':
-                s = 'Clubs'
-            elif c[-1] == 'H':
-                s = 'Hearts'
-            elif c[-1] == 'S':
-                s = 'Spades'
+        while not game.game_over():
             
-            if c[0] == '1':
-                r = '10'
-            else:
-                r = c[0]
-            c_list.append(Card(s,r))
+            print("\n")    
+            print(f"{game.cur_player.name}'s turn")
+            print(f"{game.cur_player.name}'s cards: {game.cur_player.hand}")
+            print(f"Cards on table: {game.cur_card}")
+            cards_to_play = input("Please input the card(s). Rank first then suit (e.g. 9D for 9 of Diamonds) :")
+            cards_to_play = re.findall(r"([^,\s]+)", cards_to_play)
 
-         game.proceed(c_list)
-         
+            c_list = []
+            
+            if cards_to_play:
+                for c in cards_to_play:
+                    if c[-1] == 'D':
+                        s = 'Diamonds'
+                    elif c[-1] == 'C':
+                        s = 'Clubs'
+                    elif c[-1] == 'H':
+                        s = 'Hearts'
+                    elif c[-1] == 'S':
+                        s = 'Spades'
+                    
+                    if c[0] == '1':
+                        r = '10'
+                    else:
+                        r = c[0]
+                    c_list.append(Card(s,r))
+
+            else:
+                c_list.append(None)
+
+            game.proceed(c_list)
+            
