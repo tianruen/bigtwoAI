@@ -5,7 +5,10 @@ class Actions:
 
     def available_actions(game):
         
-        available_actions = [None]          #TODO: Figure out how to avoid None in first play
+        if game.first_move == True:
+            available_actions = []
+        else:
+            available_actions = [None]          # Avoid playing skip in the first move of the game
         
         cur_cards = game.cur_card
 

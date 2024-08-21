@@ -1,7 +1,8 @@
 from big_two_AI_draft import Card, Hand, BigTwoGame
 from availableActions import Actions
 from test import Test
-import re 
+import re
+import random
 
 # class Node:
 
@@ -140,24 +141,35 @@ import re
         
         # Keep playing the game until a done is achieved
         while not done:
-            action = Actions.available_actions(new_game).random
-            #TODO: Check if syntax is correct
+            if new_game.first_move:
+                availableActions = Actions.available_actions(new_game)
+                target_card = Card('Diamonds','3')
+                action = [item for item in availableActions if target_card in item]
+                action = random.choice(action)
+            else:
+                action = random.choice(Actions.available_actions(new_game))
             #TODO: Figure out if this is a good way: We extract current player information in Actions.available_actions, without passing in any argument..?
-
-
             new_game.proceed(action)
             done = new_game.game_over()
-            # need to figure out how to set out reward
-            # probably at the end of the game then give 1 if won?
             
             if done:
+                winning_player = new_game.cur_player
                 break
 
-        if winning player = me:
+        if new_game.players.index(winning_player) == 0:                 # We are devising moves for player[0]
             v = 1
         else:
             v = 0
-            
+        
+        # Now if cur_player is player[0] (me), we choose cards from "me" own hand.
+        # But if cur_player is not me, we combine cards from all 3 opponents, find available moves and play them
+        # Question: Would this cause problems to the game flow? (One that could now be think of is having two players finishing the same time)
+        # TODO: Figure out the question (if our strategy would be problem for the game flow, or we just need some prevention mechanism)
+
+        # TODO: Can also figure out if rewards makes sense
+
+        #TODO: Test rollout
+                    
         return v
     
 

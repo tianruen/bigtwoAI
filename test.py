@@ -8,73 +8,73 @@ class Test:
  
    def test_filter_card_combinations():
      
-      player_hand = []
-      player_hand.append(Card('Diamonds','3'))
-      player_hand.append(Card('Clubs','3'))
-      player_hand.append(Card('Hearts','3'))
-      player_hand.append(Card('Spades','3'))
-      player_hand.append(Card('Diamonds','4'))
-      player_hand.append(Card('Diamonds','5'))
-      player_hand.append(Card('Diamonds','6'))
-      player_hand.append(Card('Clubs','6'))
-      player_hand.append(Card('Diamonds','7'))
-      player_hand.append(Card('Spades','8'))
-      player_hand.append(Card('Diamonds', '9'))
-      player_hand.append(Card('Diamonds','J'))
-      player_hand.append(Card('Clubs','J'))
-      player_hand.append(Card('Hearts','J'))
-      player_hand.append(Card('Spades','J'))
-      player_hand.append(Card('Diamonds','Q'))
-      player_hand.append(Card('Clubs','K'))
-      player_hand.append(Card('Diamonds','A'))
-      player_hand.append(Card('Clubs','A'))
-      player_hand.append(Card('Hearts','A'))
-      player_hand.append(Card('Spades','A'))
-      player_hand.append(Card('Spades', '2'))
+        player_hand = []
+        player_hand.append(Card('Diamonds','3'))
+        player_hand.append(Card('Clubs','3'))
+        player_hand.append(Card('Hearts','3'))
+        player_hand.append(Card('Spades','3'))
+        player_hand.append(Card('Diamonds','4'))
+        player_hand.append(Card('Diamonds','5'))
+        player_hand.append(Card('Diamonds','6'))
+        player_hand.append(Card('Clubs','6'))
+        player_hand.append(Card('Diamonds','7'))
+        player_hand.append(Card('Spades','8'))
+        player_hand.append(Card('Diamonds', '9'))
+        player_hand.append(Card('Diamonds','J'))
+        player_hand.append(Card('Clubs','J'))
+        player_hand.append(Card('Hearts','J'))
+        player_hand.append(Card('Spades','J'))
+        player_hand.append(Card('Diamonds','Q'))
+        player_hand.append(Card('Clubs','K'))
+        player_hand.append(Card('Diamonds','A'))
+        player_hand.append(Card('Clubs','A'))
+        player_hand.append(Card('Hearts','A'))
+        player_hand.append(Card('Spades','A'))
+        player_hand.append(Card('Spades', '2'))
 
-      result2 = Combo.filter_cards_combinations_23(player_hand,2)
-      result3 = Combo.filter_cards_combinations_23(player_hand,3)
-      result5 = Combo.filter_cards_combinations_5(player_hand)
+        result2 = Combo.filter_cards_combinations_23(player_hand,2)
+        result3 = Combo.filter_cards_combinations_23(player_hand,3)
+        result5 = Combo.filter_cards_combinations_5(player_hand)
 
-      result = []
-      result.extend(result2)
-      result.extend(result3)
-      result.extend(result5)
-
-      for stuff in result:
-         print(stuff)
+        result = []
+        result.extend(result2)
+        result.extend(result3)
+        result.extend(result5)
+        
+        for stuff in result:
+            print(stuff)
 
    def test_available_actions(game):
       
-      player_hand = []
-      player_hand.append(Card('Diamonds','3'))
-      player_hand.append(Card('Clubs','3'))
-      player_hand.append(Card('Hearts','3'))
-      player_hand.append(Card('Spades','3'))
-      player_hand.append(Card('Diamonds','4'))
-      player_hand.append(Card('Diamonds','5'))
-      player_hand.append(Card('Diamonds','6'))
-      player_hand.append(Card('Clubs','6'))
-      player_hand.append(Card('Diamonds','8'))
-      player_hand.append(Card('Clubs','8'))
-      player_hand.append(Card('Spades','8'))
-      player_hand.append(Card('Hearts','J'))
-      player_hand.append(Card('Spades','J'))
-      player_hand.append(Card('Clubs','K'))
-      game.cur_player.hand = player_hand
+        player_hand = []
+        player_hand.append(Card('Diamonds','3'))
+        player_hand.append(Card('Clubs','3'))
+        player_hand.append(Card('Hearts','3'))
+        player_hand.append(Card('Spades','3'))
+        player_hand.append(Card('Diamonds','4'))
+        player_hand.append(Card('Diamonds','5'))
+        player_hand.append(Card('Diamonds','6'))
+        player_hand.append(Card('Clubs','6'))
+        player_hand.append(Card('Diamonds','8'))
+        player_hand.append(Card('Clubs','8'))
+        player_hand.append(Card('Spades','8'))
+        player_hand.append(Card('Hearts','J'))
+        player_hand.append(Card('Spades','J'))
+        player_hand.append(Card('Clubs','K'))
+        game.cur_player.hand = player_hand
 
-      cur_card = []
-      cur_card.append(Card('Clubs','7'))
-      cur_card.append(Card('Hearts','7'))
-      cur_card.append(Card('Spades','7'))
-      cur_card.append(Card('Hearts','5'))
-      cur_card.append(Card('Spades','5'))
-      game.cur_card = cur_card
+        cur_card = []
+        cur_card.append(Card('Clubs','7'))
+        cur_card.append(Card('Hearts','7'))
+        cur_card.append(Card('Spades','7'))
+        cur_card.append(Card('Hearts','5'))
+        cur_card.append(Card('Spades','5'))
+        game.cur_card = cur_card
 
-      result = Actions.available_actions(game)
+        result = Actions.available_actions(game)
 
-      for stuff in result:
-         print(stuff)         
+        for stuff in result:
+            print(stuff)         
    
    def test_proceed_feature_in_BigTwoGame():
         p1 = "A"

@@ -190,6 +190,7 @@ class BigTwoGame:
 
     
     def play_game(self):
+        self.first_move = True
         self.cur_player = self.starting_player()               # find the starting player
         self.cur_card = None
     
@@ -208,6 +209,7 @@ class BigTwoGame:
     
     # To be execute when an action is played (node extend a child)
     def proceed(self, cards_to_play):
+        self.first_move = False
         # print(f"{self.cur_player.name}'s turn")
         # print(f"{self.cur_player.name}'s cards: {self.cur_player.hand}")
         # print(f"Cards on table: {self.cur_card}")
