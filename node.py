@@ -1,10 +1,10 @@
 from big_two_AI_draft import Card, Hand, BigTwoGame
 from availableActions import Actions
 from test import Test
-import re
 import random
+import copy
 
-# class Node:
+class Node:
 
 #     '''
 #     The Node class represents a node of the MCTS tree.
@@ -123,6 +123,11 @@ import random
 #             parent.N += 1
 #             parent.T = parent.T + current.T
 
+    def __init__(self, game):
+
+        # Current game (Including actions allowed, render results etc.)
+        self.game = game
+
     def rollout(self):
         '''
         The rollout is a random play from a copy of the environment of the current node using random moves.
@@ -130,25 +135,37 @@ import random
         Taken alone, this value is quite random, but, the more rollouts we will do for such node,
         the more accurate the average of the value for such node will be. This is at the core of the MCTS algorithm.
         '''
-                
-        if self.done:
-            return 0
+        
+        # if self.done:
+        #     return 100
 
-        v = 0
+        v = 100
         done = False
-        new_game = self.game.copy()
+        new_game = copy.deepcopy(self.game)
 
         
         # Keep playing the game until a done is achieved
         while not done:
+            # print()
+            # print("New round, the card in node.py is: ", new_game.cur_card)
+            
             if new_game.first_move:
                 availableActions = Actions.available_actions(new_game)
                 target_card = Card('Diamonds','3')
                 action = [item for item in availableActions if target_card in item]
+                # print("Action available: ")
+                # for i in action:
+                #     print(i)
+                # TODO: Maybe to check if actions makes sense?
                 action = random.choice(action)
             else:
-                action = random.choice(Actions.available_actions(new_game))
+                action = Actions.available_actions(new_game)
+                # for i in action:
+                #     print(i)
+                # TODO: Maybe to check if actions makes sense?
+                action = random.choice(action)
             #TODO: Figure out if this is a good way: We extract current player information in Actions.available_actions, without passing in any argument..?
+            # print("Action played: ", action) # Only required during debugging, if finalise delete yo
             new_game.proceed(action)
             done = new_game.game_over()
             
@@ -165,6 +182,7 @@ import random
         # But if cur_player is not me, we combine cards from all 3 opponents, find available moves and play them
         # Question: Would this cause problems to the game flow? (One that could now be think of is having two players finishing the same time)
         # TODO: Figure out the question (if our strategy would be problem for the game flow, or we just need some prevention mechanism)
+        # Ans: Should be fine at the moment, since game_over is true if AT LEAST one player finishes, not ONLY one player finishes?
 
         # TODO: Can also figure out if rewards makes sense
 
@@ -189,14 +207,22 @@ import random
 #### FOR TEST_AVAILABLE_ACTIONS ####        
 
 if __name__ == "__main__":
-    # p1 = input("First player name: ")
-    # p2 = input("Second player name: ")
-    # p3 = input("Third player name: ")
-    # p4 = input("Fourth player name: ")
-    # players = [p1,p2,p3,p4]
 
-    # game = BigTwoGame(players)
-    # game.play_game()        
+    result = 0
+    for i in range(200):
+        p1 = "Me"
+        p2 = "Opp1or2or3"
+        p3 = "Opp1/2/3"
+        p4 = "OneOfOpp123"
+        players = [p1,p2,p3,p4]
+
+        game = BigTwoGame(players)
+        game.play_game()
+        
+        testRollout = Node(game)
+        result += testRollout.rollout()
+
+        print(result, "/", i+1)
 
     
 
