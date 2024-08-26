@@ -51,7 +51,8 @@ class Player:
 
     def play_cards(self, cards):
         for card in cards:
-            self.hand.remove(card)
+            if card in self.hand:
+                self.hand.remove(card)
 
     def __repr__(self):
         return f"{self.name}: {self.hand}"
@@ -214,27 +215,24 @@ class BigTwoGame:
         # print(f"{self.cur_player.name}'s cards: {self.cur_player.hand}")
         # print(f"Cards on table: {self.cur_card}")
 
-        if cards_to_play and cards_to_play[0] is not None:
+        if cards_to_play and cards_to_play is not None:
             self.skip_time = 0
-            cards_before_play = self.cur_player.hand.copy()
             
             # cards_to_play = re.findall(r"([^,\s]+)", cards_to_play)
             # alternatively can use: card_to_play = card_to_play.split(",") (but whitespace won't be ignore)
 
             # Return Hand - Played card is valid, and added to the played deck. Results feed back to AI
-            self.play_turn(self.cur_player, self.cur_card, cards_to_play)                    # current player plays card
+            self.cur_card = self.play_turn(self.cur_player, self.cur_card, cards_to_play)                    # current player plays card
 
-            self.cur_card = list(set(cards_before_play) - set(self.cur_player.hand))
-            
             if self.game_over():
                 self.display_winner(self.cur_player)
             else:
-                print(f"Cards played by {self.cur_player.name}: {self.cur_card}")
+                # print(f"Cards played by {self.cur_player.name}: {self.cur_card}")
                 self.cur_player = self.next_player(self.cur_player)   # find next player
         
         else:
             self.skip_time = self.skip_time + 1
-            print(f"Cards played by {self.cur_player.name}: Skipped!")
+            # print(f"Cards played by {self.cur_player.name}: Skipped!")
             if self.skip_time > 2:
                 self.cur_card = None
             self.cur_player = self.next_player(self.cur_player)
@@ -251,16 +249,6 @@ class BigTwoGame:
         for c in cards_to_play:
             c_list.append(c)
 
-
-        
-        ######### DONT NEED THIS? AI wont play wrong gua? ###########
-        ######### OR LEAVE IT? To catch flaws in AI gameplay ###########
-        exist = True
-        for c in c_list:
-            if c not in player.hand:
-                exist = False
-                break
-
         hand = Hand(c_list)
         valid = hand.is_valid(cur_cards)
         bigger = hand.compare(cur_cards)            #hand is card chosen by player, cur_cards is card on table
@@ -268,15 +256,17 @@ class BigTwoGame:
         # print(f"bigger: {bigger}")
         # print(f"exist: {exist}")
 
-        if not valid or not bigger or not exist:
-            self.play_turn(player, cur_cards, cards_to_play)
+        if not valid or not bigger:
+            self.play_turn(player, cur_cards, cards_to_play)    # Hopefullt doesnt reach here
         else:
             # print(cards_to_play, c_list)
-            player.play_cards(c_list)
+            for p in self.players:
+                p.play_cards(c_list)
             # print(f"{player.name} played: {cards_to_play}")
             # print(f"{player.name} played: {c_list}")
-            # return hand               # Probabby not needed?
 
+        return c_list
+    
     def game_over(self):
         return any([len(player.hand) == 0 for player in self.players])
     
