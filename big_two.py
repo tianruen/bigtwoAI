@@ -237,6 +237,5 @@ if __name__ == "__main__":
     p3 = input("Third player name: ")
     p4 = input("Fourth player name: ")
     players = [p1,p2,p3,p4]
-
     game = BigTwoGame(players)
     game.play_game()
