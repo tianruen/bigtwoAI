@@ -1,7 +1,7 @@
 import time
 import copy
 import big_two_AI as bt
-import mcts1 as mcts
+import mcts
 
 s = time.time()
 
