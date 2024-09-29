@@ -96,6 +96,10 @@ class MCTS():
         self.root = root
     
     def search(self, num_iterations=10) -> MCTSNode:
+        # if only one action is available, return that action
+        if len(self.root.state.get_available_actions()) == 1:
+            return self.root.expand()
+        
         result = 0
         for i in range(num_iterations):
             node = self.tree_policy()
