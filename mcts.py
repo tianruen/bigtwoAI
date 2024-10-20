@@ -77,7 +77,9 @@ class MCTSNode():
         return self.children[argmax]
             
     def expand(self):
+        print(self)
         action = random.choice(self.state.get_available_actions())
+        print(action)
         state_ = copy.deepcopy(self.state)  # to avoid changing the state of the current node
         next_state = state_.move(action)
         child_node = MCTSNode(state=next_state, parent=self)
@@ -115,8 +117,10 @@ class MCTS():
         node = self.root
         while not node.state.is_terminal():
             if not node.is_fully_expanded():
+                print("Node not fully expanded")
                 return node.expand()
             else:
+                print("Node fully expanded")
                 node = node.best_child()
         return node
     
