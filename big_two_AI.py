@@ -532,6 +532,7 @@ class BigTwoGame:
         for player in self.players:
             if len(player.hand) == 0:
                 winner = player.name
+                self.winner = player
         print(f"{winner} is the winner")
 
 if __name__ == "__main__":
