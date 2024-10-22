@@ -54,20 +54,77 @@ import mcts
 # e = time.time()
 # print((e-s)/60)
 
+p1, p2, p3, p4 = "A", "B1", "B2", "B3"
+t1, t2, t3, t4 = "Agent", "Bot", "Bot", "Bot"
+p_t = zip([p1,p2,p3,p4], [t1,t2,t3,t4])
+game = bt.BigTwoGame(p_t)
+
+print(game.cur_player)
+
 p1_, p2_, p3_, p4_ = "A", "B1", "B2", "B3"
 t1_, t2_, t3_, t4_ = "Agent", "Bot", "Bot", "Bot"
 p_t = zip([p1_,p2_,p3_,p4_], [t1_,t2_,t3_,t4_])
 mod_game = mcts.ModifyGame(p_t)
+mod_game.players = copy.deepcopy(game.players)
+mod_game.combine_bot()
+mod_game.starting_player()
 
 print(mod_game.cur_player)
 
+
+
+state = []
+root = []
+mcts_ = []
+best_action = []
+
+def set_root_after_action(root, action_played):
+    for child_node in root.children:
+        if child_node.id == action_played:
+            return child_node
+
+def build_tree(root):
+    mcts_ = mcts.MCTS(root)
+    best_action = mcts_.search(num_iterations=200)
+    action = best_action.state.game.game_hist[-1][1]
+    return action
+
+
+
 state = mcts.BigTwoState(mod_game)
-root = mcts.MCTSNode(state)
-mcts_ = mcts.MCTS(root)
-best_action = mcts_.search(num_iterations=500)
+root = mcts.MCTSNode('None', state)
 
-for item in root.children:
-    print(item)
+while not game.game_over():
+    cur_player = game.cur_player
+    table_card = next((p_c[1] for p_c in game.game_hist[-3:][::-1] if p_c[1] is not None), None)
 
+    
+    # Run 200 search everytime before an action
+    # In the future this will be a task on its own thread
+    # It would return best action for that state
+    # Meaning it would calculate best action for both AI and Bot,
+    # But we only have AI using the best action calculated
+    choice = build_tree(root)
+    
+    if cur_player.type in ["Agent", "AI"]:
+        action = choice
+    else:
+        avail_act = cur_player.get_available_actions(table_card)
+        action = cur_player.get_action(avail_act)
+    
+    print("Action PLAYEDDDD: ")
+    print(action)
+    print("")
+    game.play_turn(action)
+    root = set_root_after_action(root,action)
+    print("ROOT IS NOWWWWWW: ")
+    print(root)
+    print("")
+    # ^TEST, no need to pass state again,
+    # Because in expand, we create the child node with updated state?
 
-    #WORKS.. Now how to retrieve them..?
+game.display_winner()
+
+    
+    
+    

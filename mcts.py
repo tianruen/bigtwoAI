@@ -55,7 +55,8 @@ class BigTwoState():
         return len(self.game.bot.hand) - len(self.game.players[0].hand)     # game.players[0] is the agent
 
 class MCTSNode():
-    def __init__(self, state:BigTwoState, parent:Optional["MCTSNode"]=None) -> None:
+    def __init__(self, action, state:BigTwoState, parent:Optional["MCTSNode"]=None) -> None:
+        self.id = action        # Top card on table / Action that leads to this node
         self.state = state      # cards that are played
         self.parent = parent
         self.children = []
@@ -80,9 +81,10 @@ class MCTSNode():
         print(self)
         action = random.choice(self.state.get_available_actions())
         print(action)
+        print("")
         state_ = copy.deepcopy(self.state)  # to avoid changing the state of the current node
         next_state = state_.move(action)
-        child_node = MCTSNode(state=next_state, parent=self)
+        child_node = MCTSNode(action=action, state=next_state, parent=self)
         if all([repr(child_node) != repr(child) for child in self.children]):
             self.children.append(child_node)
         return child_node
@@ -117,10 +119,10 @@ class MCTS():
         node = self.root
         while not node.state.is_terminal():
             if not node.is_fully_expanded():
-                print("Node not fully expanded")
+                # print("Node not fully expanded")
                 return node.expand()
             else:
-                print("Node fully expanded")
+                # print("Node fully expanded")
                 node = node.best_child()
         return node
     
@@ -132,15 +134,15 @@ class MCTS():
             state_ = state_.move(action)
         return state_.get_reward()
 
-if __name__ == "__main__":
-    p1, p2, p3, p4 = "A", "B1", "B2", "B3"
-    t1, t2, t3, t4 = "Agent", "Bot", "Bot", "Bot"
-    p_t = zip([p1,p2,p3,p4], [t1,t2,t3,t4])
-    game = ModifyGame(p_t)
-    # print(game.cur_player)
+# if __name__ == "__main__":
+#     p1, p2, p3, p4 = "A", "B1", "B2", "B3"
+#     t1, t2, t3, t4 = "Agent", "Bot", "Bot", "Bot"
+#     p_t = zip([p1,p2,p3,p4], [t1,t2,t3,t4])
+#     game = ModifyGame(p_t)
+#     # print(game.cur_player)
     
-    state = BigTwoState(game)
-    root = MCTSNode(state)
-    mcts_ = MCTS(root)
-    best_action = mcts_.search()
-    print(best_action)            
+#     state = BigTwoState(game)
+#     root = MCTSNode(state)
+#     mcts_ = MCTS(root)
+#     best_action = mcts_.search()
+#     print(best_action)            
