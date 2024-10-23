@@ -60,7 +60,7 @@ class MCTSNode():
         self.state = state      # cards that are played
         self.parent = parent
         self.children = []
-        self.num_visits = 0
+        self.num_visits = 1
         self.num_wins = 0
     
     def __repr__(self) -> str:
@@ -82,11 +82,14 @@ class MCTSNode():
         action = random.choice(self.state.get_available_actions())
         print(action)
         print("")
-        state_ = copy.deepcopy(self.state)  # to avoid changing the state of the current node
-        next_state = state_.move(action)
-        child_node = MCTSNode(action=action, state=next_state, parent=self)
-        if all([repr(child_node) != repr(child) for child in self.children]):
+        for action in self.state.get_available_actions():
+            state_ = copy.deepcopy(self.state)  # to avoid changing the state of the current node
+            next_state = state_.move(action)
+            child_node = MCTSNode(action=action, state=next_state, parent=self)
+        # if all([repr(child_node) != repr(child) for child in self.children]):
             self.children.append(child_node)
+        
+        child_node = random.choice(self.children)
         return child_node
     
     def backpropagate(self, reward):
@@ -118,11 +121,15 @@ class MCTS():
     def tree_policy(self) -> MCTSNode:
         node = self.root
         while not node.state.is_terminal():
-            if not node.is_fully_expanded():
-                # print("Node not fully expanded")
+            # if not node.is_fully_expanded():
+            #     print("Node not fully expanded")
+            #     return node.expand()
+            # else:
+            #     print("Node fully expanded")
+            #     node = node.best_child()
+            if not node.children:
                 return node.expand()
             else:
-                # print("Node fully expanded")
                 node = node.best_child()
         return node
     
