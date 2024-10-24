@@ -60,7 +60,7 @@ class MCTSNode():
         self.state = state      # cards that are played
         self.parent = parent
         self.children = []
-        self.num_visits = 1
+        self.num_visits = 0
         self.num_wins = 0
     
     def __repr__(self) -> str:
@@ -71,6 +71,7 @@ class MCTSNode():
     
     def best_child(self, c_param=1.4):
         choices_weights = [
+            float('inf') if child.num_visits == 0 else
             (child.num_wins / child.num_visits) + c_param * math.sqrt((2 * math.log(self.num_visits) / child.num_visits))
             for child in self.children
         ]
@@ -78,10 +79,7 @@ class MCTSNode():
         return self.children[argmax]
             
     def expand(self):
-        print(self)
-        action = random.choice(self.state.get_available_actions())
-        print(action)
-        print("")
+        # action = random.choice(self.state.get_available_actions())
         for action in self.state.get_available_actions():
             state_ = copy.deepcopy(self.state)  # to avoid changing the state of the current node
             next_state = state_.move(action)
@@ -90,6 +88,8 @@ class MCTSNode():
             self.children.append(child_node)
         
         child_node = random.choice(self.children)
+        print(child_node)
+        print("")
         return child_node
     
     def backpropagate(self, reward):
@@ -120,6 +120,7 @@ class MCTS():
     
     def tree_policy(self) -> MCTSNode:
         node = self.root
+        print(node)
         while not node.state.is_terminal():
             # if not node.is_fully_expanded():
             #     print("Node not fully expanded")
@@ -131,6 +132,8 @@ class MCTS():
                 return node.expand()
             else:
                 node = node.best_child()
+                print(node)
+        print("")
         return node
     
     def rollout_policy(self, state:BigTwoState):

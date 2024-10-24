@@ -86,7 +86,7 @@ def set_root_after_action(root, action_played):
 
 def build_tree(root):
     mcts_ = mcts.MCTS(root)
-    best_action = mcts_.search(num_iterations=500)
+    best_action = mcts_.search(num_iterations=200)
     action = best_action.state.game.game_hist[-1][1]
     return action
 
@@ -113,15 +113,16 @@ while not game.game_over():
         avail_act = cur_player.get_available_actions(table_card)
         action = cur_player.get_action(avail_act)
     
-    print("---------------------------------------")
+    print("------------------------------------------------------------------------------")
     print("Action PLAYEDDDD: ")
     print(action)
     print("")
+    # print(cur_player.hand)
     game.play_turn(action)
     root = set_root_after_action(root,action)
     print("ROOT IS NOWWWWWW: ")
     print(root)
-    print("---------------------------------------")
+    print("------------------------------------------------------------------------------")
     print("")
     # ^TEST, no need to pass state again,
     # Because in expand, we create the child node with updated state?
