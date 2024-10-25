@@ -71,6 +71,7 @@ class Player:
                 available_actions = findTriple(self.hand, table_cards)
             elif cards_length == 5:
                 available_actions = findFiveCardsCombo(self.hand, table_cards)
+            available_actions = sorted([sorted(act) for act in available_actions])
             available_actions.append(None)
         else:
             available_actions = []
@@ -78,6 +79,7 @@ class Player:
             available_actions.extend(Combo.filter_cards_combinations_23(self.hand, 2))       # Add possible Double plays
             available_actions.extend(Combo.filter_cards_combinations_23(self.hand, 3))       # Add possible Triple plays
             available_actions.extend(Combo.filter_cards_combinations_5(self.hand))           # Add possible Five Cards combo
+            available_actions = sorted([sorted(act) for act in available_actions])
             first_round = [act for act in available_actions if Card("Diamonds", "3") in act]
         return first_round if first_round else available_actions
     # available_actions if [Card("Diamonds", "3")] not in available_actions else first_round
@@ -532,6 +534,7 @@ class BigTwoGame:
         for player in self.players:
             if len(player.hand) == 0:
                 winner = player.name
+                self.winner = player
         print(f"{winner} is the winner")
 
 if __name__ == "__main__":
