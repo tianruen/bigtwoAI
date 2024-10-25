@@ -48,73 +48,25 @@ class Preprocess:
         features.extend(self.get_history())
         return features
 
-# note: order of how we store doesn't matter since it's just a look up table
 # single cards
-# single = set([(bt.Card(s, r),) for s in bt.Card.suits for r in bt.Card.ranks])
 single = [(bt.Card(s, r),) for s in bt.Card.suits for r in bt.Card.ranks]
 # double cards
-# double = set([(bt.Card(s[0], r), bt.Card(s[1], r)) for s in list(itertools.combinations(bt.Card.suits, 2)) for r in bt.Card.ranks])
-double = [(bt.Card(s[0], r), bt.Card(s[1], r)) for s in list(itertools.combinations(bt.Card.suits, 2)) for r in bt.Card.ranks]
+double = [tuple(sorted([bt.Card(s[0], r), bt.Card(s[1], r)])) for s in list(itertools.combinations(bt.Card.suits, 2)) for r in bt.Card.ranks]
 # triple cards
-# triple = set([(bt.Card(s[0], r), bt.Card(s[1], r), bt.Card(s[2], r)) for r in bt.Card.ranks for s in list(itertools.combinations(bt.Card.suits, 3))])
-triple = [(bt.Card(s[0], r), bt.Card(s[1], r), bt.Card(s[2], r)) for r in bt.Card.ranks for s in list(itertools.combinations(bt.Card.suits, 3))]
+triple = [tuple(sorted([bt.Card(s[0], r), bt.Card(s[1], r), bt.Card(s[2], r)])) for r in bt.Card.ranks for s in list(itertools.combinations(bt.Card.suits, 3))]
 # five cards
 suits_combo = list(itertools.product(bt.Card.suits, repeat=5))
 ranks_combo = [bt.Card.ranks[i-5:i] for i in range(5, 14)]
-straight = [tuple([bt.Card(s[i], r[i]) for i in range(5)]) for s in suits_combo for r in ranks_combo]
-flush = [tuple([bt.Card(s, r[i]) for i in range(5)]) for s in bt.Card.suits for r in list(itertools.combinations(bt.Card.ranks, 5))]
-full_house = [tuple(list(tri) + list(dou)) for tri in triple for dou in double if dou[0].rank != tri[0].rank]
-four_one = [tuple([bt.Card(s, r) for s in bt.Card.suits] + [sin]) for r in bt.Card.ranks for sin in single if r != sin[0].rank]
-five = set(straight) | set(flush) | set(full_house) | set(four_one)
-five = list(five)
+straight = [tuple(sorted([bt.Card(s[i], r[i]) for i in range(5)])) for s in suits_combo for r in ranks_combo]
+flush = [tuple(sorted([bt.Card(s, r[i]) for i in range(5)])) for s in bt.Card.suits for r in list(itertools.combinations(bt.Card.ranks, 5))]
+full_house = [tuple(sorted(list(tri) + list(dou))) for tri in triple for dou in double if dou[0].rank != tri[0].rank]
+four_one = [tuple(sorted([bt.Card(s, r) for s in bt.Card.suits] + list(sin))) for r in bt.Card.ranks for sin in single if r != sin[0].rank]
+five = list(set(straight) | set(flush) | set(full_house) | set(four_one))
 # all actions
-# all_actions = single | double | triple | five
-all_actions = single + double + triple + five
+all_actions = single + double + triple + five 
+all_actions = sorted(all_actions) + [None]
 # create hash table to map actions to numbers and vice versa
-act_to_num = {act : idx for idx, act in enumerate(all_actions)}
-num_to_act = {idx : act for idx, act in enumerate(all_actions)}
-
-### for testing
-# p1, p2, p3, p4 = "A", "B1", "B2", "B3"
-# t1, t2, t3, t4 = "Agent", "Bot", "Bot", "Bot"
-# p_t = zip([p1,p2,p3,p4], [t1,t2,t3,t4])
-# game = bt.BigTwoGame(p_t)
-# # p = Preprocess(game)
-
-# while not game.game_over():
-#     cur_player = game.cur_player
-#     table_card = next((p_c[1] for p_c in game.game_hist[-3:][::-1] if p_c[1] is not None), None)
-    
-#     # if cur_player.type in ["Agent", "AI"]:
-#     #     p = Preprocess(game)
-#     #     print("----")
-#     #     print(f"Check {p.cur_player}'s features")
-#     #     print(f"Hand Cards: {cur_player.hand}")
-#     #     print(f"Hand Cards: {p.get_hand_cards()}")
-#     #     print("-")
-#     #     print([len(player.hand) for player in game.players if player.type not in ["Agent", "AI"]])
-#     #     print(f"Opponent Cards: {p.get_opponent_num_cards()}")
-#     #     print("-")
-#     #     print(f"History: {game.game_hist}")
-#     #     print(f"Large Cards: {p.check_large_cards()}")
-#     #     print("----")
-    
-#     p = Preprocess(game)
-#     print(f"Hand Cards: {cur_player.hand}")
-#     print(torch.tensor(p.create_features()))
-        
-#     # else:
-#     avail_act = cur_player.get_available_actions(table_card)
-#     action = cur_player.get_action(avail_act)
-
-#     # print(cur_player.name)
-#     # print(f"Available action: {avail_act}")
-#     # print(f"Played: {action}")
-#     print(f"{cur_player.name} played {action}")
-        
-#     game.play_turn(action)
-# game.display_winner()
-
-# card_hist = [p_c[1] for p_c in game.game_hist if p_c[1] is not None]
-# card_hist
-# list(itertools.chain(*card_hist))
+cards_to_num = {cards : idx for idx, cards in enumerate(all_actions)}
+num_to_cards = {idx : cards for idx, cards in enumerate(all_actions)}
+encode = lambda cards: cards_to_num[cards]
+decode = lambda idx: num_to_cards[idx]
