@@ -54,12 +54,18 @@ import mcts
 # e = time.time()
 # print((e-s)/60)
 
+GREEN = "\033[92m"
+RESET = "\033[0m"
+
 p1, p2, p3, p4 = "A", "B1", "B2", "B3"
 t1, t2, t3, t4 = "Agent", "Bot", "Bot", "Bot"
 p_t = zip([p1,p2,p3,p4], [t1,t2,t3,t4])
 game = bt.BigTwoGame(p_t)
 
-print(game.cur_player)
+print("")
+for player in game.players:
+    print(player)
+# print(game.cur_player)
 
 p1_, p2_, p3_, p4_ = "A", "B1", "B2", "B3"
 t1_, t2_, t3_, t4_ = "Agent", "Bot", "Bot", "Bot"
@@ -69,6 +75,8 @@ mod_game.players = copy.deepcopy(game.players)
 mod_game.combine_bot()
 mod_game.starting_player()
 
+print("")
+print("Start:")
 print(mod_game.cur_player)
 
 
@@ -80,7 +88,6 @@ best_action = []
 
 def set_root_after_action(root, action_played):
     for child_node in root.children:
-        print(child_node)
         if child_node.id == action_played:
             return child_node
 
@@ -107,22 +114,29 @@ while not game.game_over():
     # But we only have AI using the best action calculated
     choice = build_tree(root)
     
+    print(f"{GREEN}{cur_player}{RESET}")
+
     if cur_player.type in ["Agent", "AI"]:
         action = choice
+        print(f"{GREEN}------------------------------------------------------------------------------{RESET}")
+        print(f"{GREEN}Action from MCTS{RESET}")
     else:
         avail_act = cur_player.get_available_actions(table_card)
         action = cur_player.get_action(avail_act)
+        print(f"{GREEN}------------------------------------------------------------------------------{RESET}")
+        print(f"{GREEN}Action is chosen randomly. This should be a bot{RESET}")
     
-    print("------------------------------------------------------------------------------")
-    print("Action PLAYEDDDD: ")
-    print(action)
+    
+    print(f"{GREEN}------------------------------------------------------------------------------{RESET}")
+    print(f"{GREEN}Action PLAYEDDDD: {RESET}")
+    print(f"{GREEN}{action}{RESET}")
     print("")
     # print(cur_player.hand)
     game.play_turn(action)
     root = set_root_after_action(root,action)
-    print("ROOT IS NOWWWWWW: ")
-    print(root)
-    print("------------------------------------------------------------------------------")
+    print(f"{GREEN}ROOT IS NOWWWWWW: {RESET}")
+    print(f"{GREEN}{root}{RESET}")
+    print(f"{GREEN}------------------------------------------------------------------------------{RESET}")
     print("")
     # ^TEST, no need to pass state again,
     # Because in expand, we create the child node with updated state?

@@ -5,6 +5,9 @@ from typing import List, Optional, Tuple
 
 import big_two_AI as bt
 
+RED = "\033[91m"
+RESET = "\033[0m"
+
 class ModifyGame(bt.BigTwoGame):
     def __init__(self, player_names_types:List[Tuple[str,str]]) -> None:
         self.players = [bt.Player(n, t) for n, t in player_names_types]
@@ -88,7 +91,10 @@ class MCTSNode():
             self.children.append(child_node)
         
         child_node = random.choice(self.children)
-        print(child_node)
+        if child_node.state.game.cur_player.type in ["Agent", "AI"]:
+            print(f"{RED}{child_node}{RESET}")
+        else:
+            print(child_node)
         print("")
         return child_node
     
@@ -104,7 +110,7 @@ class MCTS():
     
     def search(self, num_iterations=10) -> MCTSNode:
         # if only one action is available, return that action
-        if len(self.root.state.get_available_actions()) == 1:
+        if len(self.root.state.get_available_actions()) == 1:           ## TODO:THIS MIGHT BE A PROB
             return self.root.expand()
         
         result = 0
@@ -120,7 +126,10 @@ class MCTS():
     
     def tree_policy(self) -> MCTSNode:
         node = self.root
-        print(node)
+        if node.state.game.cur_player.type in ["Agent", "AI"]:
+            print(f"{RED}{node}{RESET}")
+        else:
+            print(node)
         while not node.state.is_terminal():
             # if not node.is_fully_expanded():
             #     print("Node not fully expanded")
@@ -132,7 +141,10 @@ class MCTS():
                 return node.expand()
             else:
                 node = node.best_child()
-                print(node)
+                if node.state.game.cur_player.type in ["Agent", "AI"]:
+                    print(f"{RED}{node}{RESET}")
+                else:
+                    print(node)
         print("")
         return node
     
