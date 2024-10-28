@@ -12,10 +12,11 @@ class ModifyGame(bt.BigTwoGame):
     def __init__(self, player_names_types:List[Tuple[str,str]]) -> None:
         self.players = [bt.Player(n, t) for n, t in player_names_types]
         self.deck = bt.Deck()
+        self.bot_play = 0
         self.distribute_cards()
         self.combine_bot()
         self.starting_player()
-        self.bot_play = 1 if self.cur_player.type not in ["Agent", "AI"] else 0   # to record the number of times bot plays. If more than 3, then its agent turn        
+        # self.bot_play = 1 if self.cur_player.type not in ["Agent", "AI"] else 0   # to record the number of times bot plays. If more than 3, then its agent turn        
         self.game_hist = []
         
     def combine_bot(self):
@@ -25,6 +26,19 @@ class ModifyGame(bt.BigTwoGame):
                 self.bot.hand.extend(player.hand)
         self.players = [player for player in self.players if player.type in ["Agent", "AI"]]
         self.players.append(self.bot)
+
+    def set_bot_play_value(self):                   ### VERY IMPORTANT: This depends heavily on player name we set....
+        
+        self.starting_player()
+
+        if self.cur_player.type in ["Agent", "AI"]:
+            self.bot_play = 0
+        elif self.cur_player.name == "B1":
+            self.bot_play = 1
+        elif self.cur_player.name == "B2":
+            self.bot_play = 2
+        elif self.cur_player.name == "B3":
+            self.bot_play = 3
                 
     def next_player(self, cur_player):
         if self.bot_play == 3:
