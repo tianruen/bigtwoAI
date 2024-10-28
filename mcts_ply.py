@@ -81,6 +81,7 @@ mod_game.starting_player()
 print("")
 print("Start:")
 print(mod_game.cur_player)
+print(mod_game.bot_play)
 
 
 
