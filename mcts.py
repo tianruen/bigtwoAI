@@ -6,6 +6,7 @@ from typing import List, Optional, Tuple
 import big_two_AI as bt
 
 RED = "\033[91m"
+YELLOW = "\033[93m"
 RESET = "\033[0m"
 
 class ModifyGame(bt.BigTwoGame):
@@ -95,7 +96,7 @@ class MCTSNode():
         argmax = choices_weights.index(max(choices_weights))
         return self.children[argmax]
             
-    def expand(self):
+    def expand(self, one_available_action=False):
         # action = random.choice(self.state.get_available_actions())
         for action in self.state.get_available_actions():
             state_ = copy.deepcopy(self.state)  # to avoid changing the state of the current node
@@ -110,6 +111,20 @@ class MCTSNode():
         else:
             print(child_node)
         print("")
+
+        ## THE FOLLOWING IS TO CHECK
+        ## That IN THE SCENARIO THAT THERE IS ONLY ONE AVAILABLE ACTION
+        ## DID WE DUPLICATE THE SAME NODE
+        ## AND HAVE A CHANCE OF CHOOSING THE NEW EXPANDED NODE
+        ## THEREFORE REMOVING THE TREE RECORD WE BUILT FOR THE ORGINAL CHILD NODE....... 
+        if one_available_action:
+            for child in self.children:
+                print(child)
+                for grandchild in child.children:
+                    print(f" {grandchild}")
+                
+                print("")
+
         return child_node
     
     def backpropagate(self, reward):
@@ -125,8 +140,14 @@ class MCTS():
     def search(self, num_iterations=10) -> MCTSNode:
         # if only one action is available, return that action
         if len(self.root.state.get_available_actions()) == 1:           ## TODO:THIS MIGHT BE A PROB
-            return self.root.expand()
-        
+            print(f"{YELLOW}Only has one available actions{RESET}")
+            for child in self.root.children:
+                if child.state.game.cur_player.type in ["Agent", "AI"]:
+                    print(f"{RED}{child}{RESET}")
+                else:
+                    print(child)
+            return self.root.expand(one_available_action=True)
+
         result = 0
         for i in range(num_iterations):
             node = self.tree_policy()
