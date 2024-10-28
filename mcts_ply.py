@@ -72,6 +72,9 @@ t1_, t2_, t3_, t4_ = "Agent", "Bot", "Bot", "Bot"
 p_t = zip([p1_,p2_,p3_,p4_], [t1_,t2_,t3_,t4_])
 mod_game = mcts.ModifyGame(p_t)
 mod_game.players = copy.deepcopy(game.players)
+mod_game.set_bot_play_value()  ### VERY IMPORTANT: This depends heavily on player name we set....
+                               ###ALSO need to call before combine_bot
+                               ###Find a better way? Not very neat.....
 mod_game.combine_bot()
 mod_game.starting_player()
 
@@ -144,5 +147,6 @@ while not game.game_over():
 game.display_winner()
 
     
-    
+# VERY IMPORTANTTT!!: In the future, to incorporate to real life game, we need to know which player is starting. This is needed to set self.bot_play value in ModifyGame, which would affect action chosen for Agent.
+## Neglecting this might cause error along the tree generation and action picking    
     
