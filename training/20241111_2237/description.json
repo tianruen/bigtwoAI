@@ -1,0 +1,11 @@
+{
+    "save_path": null,
+    "model_path": "alphazero.pt",
+    "num_match": 100,
+    "print_freq": 1,
+    "mcts_iter": 200,
+    "c_param": 5.0,
+    "tau": 3.0,
+    "regularise_lambda": 1.0,
+    "desc": "train from earliest trained model"
+}
