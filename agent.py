@@ -117,7 +117,7 @@ def train():
     # define save path
     time_ = datetime.datetime.now().strftime('%Y%m%d_%H%M')
     if args.save_path: save_path = args.save_path
-    else: save_path = "training_" + time_
+    else: save_path = f"training/{time_}" 
     os.makedirs(save_path, exist_ok=True)
     
     # save arguments into a json file
