@@ -138,7 +138,7 @@ class MCTS():
     def __init__(self, root: MCTSNode) -> None:
         self.root = root
         
-    def search(self, policy_network, num_iterations=100, c_param=1.4, tau=1.5):
+    def search(self, policy_network, num_iterations=100, c_param=1.4, tau=1.5, mode="train"):
         for _ in range(num_iterations):
             node = self.root
             while not node.state.is_terminal():
@@ -156,7 +156,10 @@ class MCTS():
                 node.backpropagate(reward)
                 
         dist = self.root.visit_distribution(tau)
-        idx = torch.multinomial(torch.tensor(list(dist.values())), 1, replacement=False).item()
+        if mode == "train":
+            idx = torch.multinomial(torch.tensor(list(dist.values())), 1, replacement=False).item()
+        elif mode == "eval":
+            idx = max(dist, key=dist.get)
         # chosen_node = self.root.children[idx]
         chosen_node = list(self.root.children.values())[idx]
         action = preprocess.decode(list(dist.keys())[idx])
