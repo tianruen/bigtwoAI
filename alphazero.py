@@ -156,11 +156,7 @@ class MCTS():
                 node.backpropagate(reward)
                 
         dist = self.root.visit_distribution(tau)
-        if mode == "train":
-            idx = torch.multinomial(torch.tensor(list(dist.values())), 1, replacement=False).item()
-        elif mode == "eval":
-            idx = max(dist, key=dist.get)
-        # chosen_node = self.root.children[idx]
+        idx = torch.multinomial(torch.tensor(list(dist.values())), 1, replacement=False).item()
         chosen_node = list(self.root.children.values())[idx]
         action = preprocess.decode(list(dist.keys())[idx])
         action = list(action) if action else action
