@@ -5,6 +5,7 @@ import torch
 import datetime
 import argparse
 import os
+import json
 
 import big_two_AI as bt
 import mcts
@@ -74,8 +75,8 @@ class Agent:
         df = pd.DataFrame(self.memory, columns=["num_match", "features", "dist", "reward"])
         df.to_csv(f"{save_path}/memory_{self.num_match}.csv", index=False)
     
-    def train_short_memory(self, state, action_dist, rewards):
-        self.model.train(state, action_dist, rewards)
+    def train_short_memory(self, state, action_dist, rewards, regularise_lambda=0):
+        self.model.train(state, action_dist, rewards, regularise_lambda)
         
     def train_long_memory(self):
         if len(self.memory) > self.batch_size:
@@ -88,22 +89,25 @@ class Agent:
 def parse_args():
     # create parser
     parser = argparse.ArgumentParser(description="Train AlphaZero model")
-    # save path argument
-    parser.add_argument("--save_path", type=str, default=None, help="Path to save the model; default=None")
-    # load model path argument
-    parser.add_argument("--model_path", type=str, default=None, help="Path to load the model; default=None")
-    # match number argument
-    parser.add_argument("--num_match", type=int, default=None, help="Number of matches have been played; default=None")
-    # printing frequency argument
-    parser.add_argument("--print_freq", type=int, default=None, help="Printing frequency; default=None")
-    # mcts_iter argument
-    parser.add_argument("--mcts_iter", type=int, default=200, help="Number of iterations per round in MCTS; default=200")
-    # c_param argument
+    
+    parser.add_argument("--save_path", type=str, default=None, 
+                        help="Path to save the model; default=None")
+    parser.add_argument("--model_path", type=str, default=None, 
+                        help="Path to load the model; default=None")
+    parser.add_argument("--num_match", type=int, default=None, 
+                        help="Number of matches have been played; default=None")
+    parser.add_argument("--print_freq", type=int, default=None, 
+                        help="Printing frequency; default=None")
+    parser.add_argument("--mcts_iter", type=int, default=200, 
+                        help="Number of iterations per round in MCTS; default=200")
     parser.add_argument("--c_param", type=float, default=1.4, 
                         help="Exploration constant. Higher value favours more exploration by the agent; default=1.4")
-    # tau argument
     parser.add_argument("--tau", type=float, default=1.5, 
                         help="Temperature. The higher it is, the more uniform across the probability distribtuion of available actions; default=1.5")
+    parser.add_argument("--regularise_lambda", type=float, default=0,
+                        help="L2 regularisation parameter; default=0")
+    parser.add_argument("--desc", type=str, default=None, 
+                        help="Description of the training; default=None")
     return parser.parse_args()
         
 def train():
@@ -115,6 +119,10 @@ def train():
     if args.save_path: save_path = args.save_path
     else: save_path = "training_" + time_
     os.makedirs(save_path, exist_ok=True)
+    
+    # save arguments into a json file
+    with open(f"{save_path}/description.json", "w") as json_file:
+        json.dump(vars(args), json_file, indent=4)  # `indent=4` makes the file more readable
     
     agent = Agent()
     if args.model_path:
@@ -128,7 +136,7 @@ def train():
     for _ in range(1000):
         short_mem = agent.self_play(agent.model, mcts_iter=args.mcts_iter, c_param=args.c_param, tau=args.tau)
         _, state, action_dist, rewards = zip(*short_mem)
-        agent.train_short_memory(state, action_dist, rewards)
+        agent.train_short_memory(state, action_dist, rewards, regularise_lambda=args.regularise_lambda)
         agent.train_long_memory()
         
         if agent.num_match % 10 == 0:
