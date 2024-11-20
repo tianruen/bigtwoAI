@@ -1,0 +1,11 @@
+{
+    "save_path": null,
+    "model_path": "training/20241113_2227/alphazero_1240.pt",
+    "num_match": 1240,
+    "print_freq": 5,
+    "mcts_iter": 200,
+    "c_param": 1.4,
+    "tau": 1.0,
+    "regularise_lambda": 1.0,
+    "desc": null
+}
