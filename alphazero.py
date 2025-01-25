@@ -20,7 +20,7 @@ class ModifyGame(bt.BigTwoGame):
         self.original_game = game
         self.players = [p for p in game.players]
         self.bot_play = 0   # to record the number of times bot plays. If more than 3, then its agent turn        
-        self.player_idx = player_idx
+        self.player_idx = player_idx    # determine the index of the agent, index 0 is for starting player, 1 for the second player and so on
         self.game_hist = game.game_hist
         self.cur_player = game.cur_player
         self.combine_bot()
@@ -44,11 +44,12 @@ class ModifyGame(bt.BigTwoGame):
 class BigTwoState():
     def __init__(self, game:ModifyGame) -> None:
         self.game = game
-        self.player = self.game.cur_player
+        self.cur_player = self.game.cur_player
         self.table_cards = next((p_c[1] for p_c in self.game.game_hist[-3:][::-1] if p_c[1] is not None), None)   # p_c: (player, played_cards)
         
+    #TODO: might want to add new parameters: num_hand_cards to indicate the number of hand cards a player has. need it for comb bot as we combine all opponent cards
     def get_available_actions(self):
-        return self.player.get_available_actions(self.table_cards)
+        return self.cur_player.get_available_actions(self.table_cards)
         
     def move(self, action:List[bt.Card]):
         self.game.play_turn(action)
@@ -58,8 +59,9 @@ class BigTwoState():
         return self.game.game_over()
         
     def get_reward(self):
+        # to check if the agent has won. Since agent's index is always 0, therefore 1 if all hand cards have been played, else -1
         winner_idx = [len(p.hand) == 0 for p in self.game.players].index(True)
-        return 1 if winner_idx == 0 else -1 # index is always 0 for the playing agent
+        return 1 if winner_idx == 0 else -1
         
 class MCTSNode():
     def __init__(self, state:BigTwoState, parent:Optional["MCTSNode"]=None, prior_prob:float=0) -> None:
@@ -71,16 +73,16 @@ class MCTSNode():
         self.prior_prob = prior_prob
     
     def __repr__(self) -> str:
-        return f"{self.state.game.game_hist[-1][1]}" if len(self.state.game.game_hist) > 0 else "None"
+        return f"Table card: {self.state.game.game_hist[-1][1]}" if len(self.state.game.game_hist) > 0 else "Table card: None"
         
     def is_fully_expanded(self):
         return len(self.children) == len(self.state.get_available_actions())
     
     def upper_confidence_tree(self, c_param=1.4) -> Optional["MCTSNode"]:
         choices_weights = []
-        for child in self.children.values():
+        for child in self.children.values():        # self.children is a dictionary, with keys being the cards and values being the MCTS node after playing the cards
             Q = child.q_value / child.num_visits if child.num_visits > 0 else 0
-            U = c_param * child.prior_prob * math.sqrt(self.num_visits) / (1 + child.num_visits)
+            U = c_param * child.prior_prob * math.sqrt(self.num_visits-1) / (1 + child.num_visits)  # -1 in the sqrt term because the total of children's num visit is always lesser than the parent node's num visit by 1
             choices_weights.append(Q + U)
         # choices_weights = [
         # child.q_value / child.num_visits + c_param * child.prior_prob * math.sqrt(self.num_visits) / (1 + child.num_visits) if child.num_visits > 0 else child.prior_prob
@@ -129,6 +131,7 @@ class MCTSNode():
         return value.item()
     
     def backpropagate(self, state_value):
+        # TODO: need to modify such that agent's value is negative of opponent's value
         self.num_visits += 1
         self.q_value += state_value
         if self.parent:
@@ -137,6 +140,7 @@ class MCTSNode():
 class MCTS():
     def __init__(self, root: MCTSNode) -> None:
         self.root = root
+        self.cur_player = self.root.state.cur_player
         
     def search(self, policy_network, num_iterations=100, c_param=1.4, tau=1.5, mode="train"):
         for _ in range(num_iterations):
