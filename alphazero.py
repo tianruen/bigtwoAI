@@ -130,12 +130,14 @@ class MCTSNode():
                 
         return value.item()
     
-    def backpropagate(self, state_value):
+    def backpropagate(self, state_value, sign):
         # TODO: need to modify such that agent's value is negative of opponent's value
         self.num_visits += 1
-        self.q_value += state_value
+        if sign % 4 == 0: self.q_value += state_value
+        else: self.q_value -= state_value
+        sign -= 1
         if self.parent:
-            self.parent.backpropagate(state_value)
+            self.parent.backpropagate(state_value, sign)
     
 class MCTS():
     def __init__(self, root: MCTSNode) -> None:
@@ -145,19 +147,23 @@ class MCTS():
     def search(self, policy_network, num_iterations=100, c_param=1.4, tau=1.5, mode="train"):
         for _ in range(num_iterations):
             node = self.root
+            sign = 0    # the current state is the previous player had played cards, hence it's agent's turn to play cards.
+            # so multiple of 4 is always agent's value, while others is opponents' value
             while not node.state.is_terminal():
                 # print(i, node)
                 if len(node.children) == 0:
                     # print(i, node, "expand")
                     # print(i, node.state.get_available_actions(), "available actions")
                     state_value = node.expand(policy_network)
-                    node.backpropagate(state_value)
+                    if sign % 4 != 0: state_value = -state_value
+                    node.backpropagate(state_value, sign)
                     break
                 node = node.upper_confidence_tree(c_param)
+                sign += 1
             if node.state.is_terminal():
                 # print("END-----------------------------------")
                 reward = node.state.get_reward()
-                node.backpropagate(reward)
+                node.backpropagate(reward, sign)
                 
         dist = self.root.visit_distribution(tau)
         idx = torch.multinomial(torch.tensor(list(dist.values())), 1, replacement=False).item()
