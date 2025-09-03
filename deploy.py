@@ -12,7 +12,7 @@ import model
 
 app = FastAPI()
 agent = model.deepPG(143, 18880, 256)
-agent.load_state_dict(torch.load("training/20241119_0224/alphazero_1000.pt"))
+agent.load_state_dict(torch.load("training/20250125_0400/alphazero_250.pt"))
 
 @app.get("/")
 def read_root():
@@ -65,7 +65,7 @@ def get_action(input: Cards):
     # s = time.time()
     search_done = False
     node, action, dist = mcts_.search(policy_network=agent, 
-                                      num_iterations=200, 
+                                      num_iterations=500, 
                                       c_param=0.01, 
                                       tau=0.01,)
     search_done = True
